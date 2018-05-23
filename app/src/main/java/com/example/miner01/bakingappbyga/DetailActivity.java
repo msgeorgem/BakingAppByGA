@@ -1,15 +1,15 @@
 package com.example.miner01.bakingappbyga;
 
 
+import android.app.FragmentManager;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.app.FragmentManager;
+import android.view.View;
 import android.widget.Toast;
-
 
 import com.example.miner01.bakingappbyga.Utils.JsonString;
 import com.example.miner01.bakingappbyga.Utils.JsonUtils1;
@@ -20,27 +20,31 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class DetailActivity extends AppCompatActivity implements StepsFragment.OnFragmentInteractionListener{
+public class DetailActivity extends AppCompatActivity implements StepsFragment.OnFragmentInteractionListener {
 
 
     private StepsFragment mStepsFragment;
-    private ActivityDetailBinding mDetailBinding;
+
+    public static ActivityDetailBinding mDetailBinding;
     public static Recipes recipes;
     public static String currentRecipeID;
     private int currentRecipeIDInt;
     private List<String[]> recipesIngredients;
     private List<String[]> currentRecipeIngredients = new ArrayList<>();
+    private Uri mCurrentItemUri;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mDetailBinding = DataBindingUtil.setContentView(this,R.layout.activity_detail);
+        mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
         Intent intent = getIntent();
         if (intent == null) {
             closeOnError();
         }
+        mCurrentItemUri = intent.getData();
+
 
         recipes = JsonUtils1.parseRecipesJson(JsonString.strJson);
 
@@ -77,17 +81,21 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         }
 
         mDetailBinding.part1.ingredients.setText(builder2.toString());
-
+        mDetailBinding.part1.ingredients.setVisibility(View.VISIBLE);
+        mDetailBinding.part2.stepsContainer.setVisibility(View.VISIBLE);
+        mDetailBinding.part3.detailedStepContainer.setVisibility(View.VISIBLE);
 
         mStepsFragment = new StepsFragment();
         FragmentManager managerA = getFragmentManager();
         managerA.beginTransaction()
                 .replace(mDetailBinding.part2.stepsContainer.getId(), mStepsFragment, mStepsFragment.getTag())
                 .commit();
+
+
     }
 
 
-        @Override
+    @Override
     public void onFragmentInteraction(Uri uri) {
 
     }

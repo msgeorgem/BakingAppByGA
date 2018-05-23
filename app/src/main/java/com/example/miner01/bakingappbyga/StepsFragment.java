@@ -1,10 +1,11 @@
 package com.example.miner01.bakingappbyga;
 
 
-import android.content.Intent;
+import android.app.Fragment;
+import android.app.FragmentTransaction;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
-import android.app.Fragment;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,9 +14,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.miner01.bakingappbyga.databinding.FragmentDetailedStepBinding;
+import com.example.miner01.bakingappbyga.databinding.FragmentStepsBinding;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.example.miner01.bakingappbyga.DetailActivity.mDetailBinding;
 
 
 /**
@@ -45,7 +50,9 @@ public class StepsFragment extends Fragment {
     private RecipeDetailAdapter.OnItemClickListener mListener;
     private RecipeDetailAdapter mAdapter = new RecipeDetailAdapter(currentRecipeDetails, mListener);
     public static final String LOG_TAG = StepsFragment.class.getSimpleName();
-
+    private DetailedStepFragment mDetailedStepFragment;
+    private FragmentDetailedStepBinding mFragmentDetailedStepsBinding;
+    private FragmentStepsBinding mFragmentStepsBinding;
 
     public StepsFragment() {
         // Required empty public constructor
@@ -55,12 +62,16 @@ public class StepsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_steps, container, false);
+
+//        view = inflater.inflate(R.layout.fragment_steps, container, false);
+        mFragmentStepsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_steps, container, false);
+        view = mFragmentStepsBinding.getRoot();
 
         currentRecipeIDInt = Integer.parseInt(DetailActivity.currentRecipeID);
 
         // Find a reference to the {@link ListView} in the layout
-        stepsRecyclerView = view.findViewById(R.id.list_steps);
+//        stepsRecyclerView = view.findViewById(R.id.list_steps);
+        stepsRecyclerView = mFragmentStepsBinding.listSteps;
         currentRecipeDetails = getCurrentRecipeDetails(currentRecipeIDInt);
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
@@ -73,12 +84,18 @@ public class StepsFragment extends Fragment {
                 String detailedDescription = item[1];
                 String videoUrl = item[2];
 
-                Intent intent1 = new Intent(getActivity(), DetailActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putString(EXTRA_DESCRIPTION, detailedDescription);
+                bundle.putString(EXTRA_VIDEOURL, videoUrl);
 
-                intent1.putExtra(EXTRA_DESCRIPTION, detailedDescription);
-                intent1.putExtra(EXTRA_VIDEOURL, videoUrl);
 
-                startActivity(intent1);
+                mDetailedStepFragment = new DetailedStepFragment();
+                mDetailedStepFragment.setArguments(bundle);
+
+                replaceFragment(mDetailedStepFragment);
+                mDetailBinding.part1.ingredients.setVisibility(View.GONE);
+                mDetailBinding.part2.stepsContainer.setVisibility(View.GONE);
+                mDetailBinding.part3.detailedStepContainer.setVisibility(View.VISIBLE);
             }
         };
 
@@ -91,6 +108,14 @@ public class StepsFragment extends Fragment {
 
         return view;
     }
+
+    public void replaceFragment(Fragment fragment) {
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        transaction.replace(mDetailBinding.part3.detailedStepContainer.getId(), fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
 
     private ArrayList<String[]> getCurrentRecipeDetails(int currentRecipeIDInt) {
         ArrayList<String[]> currentRecipeDetails = new ArrayList<>();
