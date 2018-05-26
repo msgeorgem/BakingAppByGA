@@ -83,7 +83,8 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         mDetailBinding.part1.ingredients.setText(builder2.toString());
         mDetailBinding.part1.ingredients.setVisibility(View.VISIBLE);
         mDetailBinding.part2.stepsContainer.setVisibility(View.VISIBLE);
-        mDetailBinding.part3.detailedStepContainer.setVisibility(View.VISIBLE);
+        mDetailBinding.part5.detailNavigationTemp.setVisibility(View.GONE);
+//        mDetailBinding.part3.detailedStepContainer.setVisibility(View.VISIBLE);
 
         mStepsFragment = new StepsFragment();
         FragmentManager managerA = getFragmentManager();

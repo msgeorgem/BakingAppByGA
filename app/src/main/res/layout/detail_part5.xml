@@ -1,55 +1,55 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <TextView
-            android:id="@+id/step_back"
+        <LinearLayout
+            android:id="@+id/detail_navigation_temp"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintVertical_weight="0.2"
-            android:gravity="start"
-            android:textAllCaps="true"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:layout_height="50dp"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/step_number"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintVertical_weight="0.6"
-            android:gravity="start"
-            android:textAllCaps="true"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toRightOf="@id/step_back"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/step_back"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="0.2"
+                android:gravity="start"
+                android:text="@string/back_step"
+                android:textAllCaps="true"
+                android:textSize="18sp" />
 
-        <TextView
-            android:id="@+id/step_forth"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="8dp"
-            android:layout_marginRight="8dp"
-            android:layout_marginStart="8dp"
-            app:layout_constraintVertical_weight="0.2"
-            android:gravity="start"
-            android:textAllCaps="true"
-            android:textSize="18sp"
-            app:layout_constraintLeft_toRightOf="@id/step_number"
-            app:layout_constraintTop_toTopOf="parent" />
+            <TextView
+                android:id="@+id/step_number"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="0.6"
+                android:gravity="center"
+                android:text="@string/current_step"
+                android:textAllCaps="true"
+                android:textSize="18sp" />
 
+            <TextView
+                android:id="@+id/step_forth"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_marginRight="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_weight="0.2"
+                android:gravity="start"
+                android:text="@string/next_step"
+                android:textAllCaps="true"
+                android:textSize="18sp" />
+        </LinearLayout>
 
     </android.support.constraint.ConstraintLayout>
 </layout>

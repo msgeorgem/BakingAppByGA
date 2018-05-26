@@ -17,7 +17,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
@@ -92,10 +91,6 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
 
         // Initialize the player view.
         mPlayerView = view.findViewById(R.id.playerView);
-        // Load the question mark as the background image until the user answers the question.
-        mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
-                (getResources(), R.drawable.no_video));
-
         // String currentVideoUrl = intent.getStringExtra(StepsFragment.EXTRA_VIDEOURL);
         // Initialize the Media Session.
         initializeMediaSession();
@@ -112,8 +107,10 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         }
 
         if (uriCurrentVideoStep == null) {
-            Toast.makeText(getActivity(), getString(R.string.sample_not_found_error),
-                    Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getActivity(), getString(R.string.sample_not_found_error),
+//                    Toast.LENGTH_SHORT).show();
+            mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
+                    (getResources(), R.drawable.no_video));
             return view;
         } else {
             // Initialize the player.
