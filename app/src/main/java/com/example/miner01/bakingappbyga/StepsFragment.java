@@ -37,6 +37,7 @@ public class StepsFragment extends Fragment {
 
     public static final String EXTRA_DESCRIPTION = "EXTRA_DESCRIPTION";
     public static final String EXTRA_VIDEOURL = "EXTRA_VIDEOURL";
+    public static final String EXTRA_STEP_NUMBER = "EXTRA_STEP_NUMBER";
 
     private View view;
 
@@ -44,11 +45,12 @@ public class StepsFragment extends Fragment {
 
 
     private List<String[]> recipesSteps;
-    private ArrayList<String[]> currentRecipeDetails = new ArrayList<>();
+
+    public static ArrayList<String[]> currentRecipeDetailsWithStepNo = new ArrayList<>();
 
     private static RecyclerView stepsRecyclerView;
     private RecipeDetailAdapter.OnItemClickListener mListener;
-    private RecipeDetailAdapter mAdapter = new RecipeDetailAdapter(currentRecipeDetails, mListener);
+    private RecipeDetailAdapter mAdapter = new RecipeDetailAdapter(currentRecipeDetailsWithStepNo, mListener);
     public static final String LOG_TAG = StepsFragment.class.getSimpleName();
     private DetailedStepFragment mDetailedStepFragment;
     private FragmentDetailedStepBinding mFragmentDetailedStepsBinding;
@@ -69,10 +71,11 @@ public class StepsFragment extends Fragment {
 
         currentRecipeIDInt = Integer.parseInt(DetailActivity.currentRecipeID);
 
+
         // Find a reference to the {@link ListView} in the layout
 //        stepsRecyclerView = view.findViewById(R.id.list_steps);
         stepsRecyclerView = mFragmentStepsBinding.listSteps;
-        currentRecipeDetails = getCurrentRecipeDetails(currentRecipeIDInt);
+        currentRecipeDetailsWithStepNo = getCurrentRecipeDetailsWithStepNo();
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
 
@@ -81,12 +84,14 @@ public class StepsFragment extends Fragment {
             @Override
             public void onItemClick(String[] item) {
 
-                String detailedDescription = item[1];
-                String videoUrl = item[2];
+                String stepNumber = item[1];
+                String detailedDescription = item[3];
+                String videoUrl = item[4];
 
                 Bundle bundle = new Bundle();
                 bundle.putString(EXTRA_DESCRIPTION, detailedDescription);
                 bundle.putString(EXTRA_VIDEOURL, videoUrl);
+                bundle.putString(EXTRA_STEP_NUMBER, stepNumber);
 
 
                 mDetailedStepFragment = new DetailedStepFragment();
@@ -99,7 +104,7 @@ public class StepsFragment extends Fragment {
             }
         };
 
-        mAdapter = new RecipeDetailAdapter(currentRecipeDetails, mListener);
+        mAdapter = new RecipeDetailAdapter(currentRecipeDetailsWithStepNo, mListener);
 
         // Set the adapter on the {@link ListView}
         // so the list can be populated in the user interface
@@ -126,17 +131,38 @@ public class StepsFragment extends Fragment {
             int firstStepElement = Integer.parseInt(elements[0]);
 
             if (firstStepElement == currentRecipeIDInt) {
-                String[] elements3 = new String[3];
-                elements3[0] = elements[1];
-                elements3[1] = elements[2];
-                elements3[2] = elements[3];
+                String[] elements4 = new String[4];
 
-                currentRecipeDetails.add(elements3);
-                Log.i("current_steps9999979", elements3[0]+" "+elements3[1]+" "+ elements3[2]);
+                elements4[0] = elements[0];
+                elements4[1] = elements[1];
+                elements4[2] = elements[2];
+                elements4[3] = elements[3];
+
+                currentRecipeDetails.add(elements4);
+                Log.i("current_steps99", elements4[0] + " " + elements4[1] + " " + elements4[2] + " " + elements4[3]);
             }
         }
         return currentRecipeDetails;
     }
+
+    private ArrayList<String[]> getCurrentRecipeDetailsWithStepNo() {
+        ArrayList<String[]> currentRecipeDetails = new ArrayList<>();
+
+        ArrayList<String[]> tempCurrentRecipeDetails = getCurrentRecipeDetails(currentRecipeIDInt);
+        for (int i = 0; i < tempCurrentRecipeDetails.size(); i++) {
+            String[] elements = tempCurrentRecipeDetails.get(i);
+            String[] elements5 = new String[5];
+            elements5[0] = elements[0];
+            elements5[1] = String.valueOf(i);
+            elements5[2] = elements[1];
+            elements5[3] = elements[2];
+            elements5[4] = elements[3];
+            currentRecipeDetails.add(elements5);
+        }
+        return currentRecipeDetails;
+    }
+
+
 
 
     public interface OnFragmentInteractionListener {

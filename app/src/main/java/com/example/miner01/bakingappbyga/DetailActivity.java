@@ -32,12 +32,14 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
     private List<String[]> recipesIngredients;
     private List<String[]> currentRecipeIngredients = new ArrayList<>();
     private Uri mCurrentItemUri;
+    public static String mStep;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+        mStep = getResources().getString(R.string.step);
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -49,7 +51,7 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         recipes = JsonUtils1.parseRecipesJson(JsonString.strJson);
 
         currentRecipeID = intent.getStringExtra(MainActivity.EXTRA_ID);
-        currentRecipeIDInt = Integer.parseInt(currentRecipeID);
+//        currentRecipeIDInt = Integer.parseInt(currentRecipeID);
 
         Log.i("detail activity", currentRecipeID);
 

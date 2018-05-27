@@ -7,6 +7,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Locale;
 
 public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapter.MainViewHolder> {
 
@@ -39,7 +40,9 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
         // Get the {@link News} object located at this position in the list
         final String[] currentStep = mListStepsAdapter.get(position);
 
-        viewHolder.detailStepTextView.setText(currentStep[0]);
+        viewHolder.stepNo.setText(String.format(Locale.ENGLISH, "%s: %s", DetailActivity.mStep,
+                currentStep[1]));
+        viewHolder.detailStepTextView.setText(currentStep[2]);
     }
 
     public interface OnItemClickListener {
@@ -47,11 +50,13 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
     }
 
     public static class MainViewHolder extends RecyclerView.ViewHolder {
+        TextView stepNo;
         TextView detailStepTextView;
 
 
         private MainViewHolder(View view) {
             super(view);
+            this.stepNo = view.findViewById(R.id.step_no);
             this.detailStepTextView = view
                     .findViewById(R.id.detail_step);
         }

@@ -39,8 +39,11 @@ import com.google.android.exoplayer2.util.Util;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Locale;
 
 import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_DESCRIPTION;
+import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_STEP_NUMBER;
 import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_VIDEOURL;
 
 
@@ -63,6 +66,21 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
     private SimpleExoPlayerView mPlayerView;
     private PlaybackStateCompat.Builder mStateBuilder;
     private NotificationManager mNotificationManager;
+    private ArrayList<String[]> currentRecipeDetailsWithStepNo1 = new ArrayList<>();
+    private int recipeNumber;
+    private int stepNumber;
+    private String shortDescription;
+    private String detailedDescription;
+    private String videoStep;
+    private int currentStepNumberInt;
+    private Bundle bundle;
+    private TextView mCurrentRecipeNo;
+    private TextView mDetailedDescription;
+    private String mCurrentRecipeNoLabel;
+    private TextView mStepForth;
+    private TextView mStepBack;
+
+
 
     public DetailedStepFragment() {
         // Required empty public constructor
@@ -74,101 +92,69 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         // Inflate the layout for this fragment
         view = inflater.inflate(R.layout.fragment_detailed_step, container, false);
 
-        String currentDetailedDescription = "";
-
-        String currentVideoStep = "";
-
-        Bundle bundle = this.getArguments();
-        if (bundle != null) {
-            currentDetailedDescription = bundle.getString(EXTRA_DESCRIPTION);
-            Log.i("detailed_step_descr", currentDetailedDescription);
-            currentVideoStep = bundle.getString(EXTRA_VIDEOURL);
-            Log.i("detailed_step_link", currentVideoStep);
-        }
-        TextView detailedDescription = view.findViewById(R.id.detailed_description);
-        detailedDescription.setText(currentDetailedDescription);
-
-
+        currentRecipeDetailsWithStepNo1 = StepsFragment.currentRecipeDetailsWithStepNo;
         // Initialize the player view.
         mPlayerView = view.findViewById(R.id.playerView);
-        // String currentVideoUrl = intent.getStringExtra(StepsFragment.EXTRA_VIDEOURL);
-        // Initialize the Media Session.
+        mDetailedDescription = view.findViewById(R.id.detailed_description);
+        mCurrentRecipeNoLabel = getResources().getString(R.string.current_step);
+        mCurrentRecipeNo = view.findViewById(R.id.step_number);
+        mStepForth = view.findViewById(R.id.step_forth);
+
+        String currentStepNumber = "";
+        String currentDetailedDescription = "";
+        String currentVideoStep = "";
+
         initializeMediaSession();
 
-        URL url;
-        Uri uriCurrentVideoStep = null;
-        try {
-            url = new URL(currentVideoStep);
-            uriCurrentVideoStep = Uri.parse(url.toURI().toString());
-        } catch (MalformedURLException e1) {
-            e1.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
+        bundle = this.getArguments();
+        if (bundle != null) {
+            currentStepNumber = bundle.getString(EXTRA_STEP_NUMBER);
+            currentStepNumberInt = Integer.parseInt(bundle.getString(EXTRA_STEP_NUMBER));
+
+            currentDetailedDescription = bundle.getString(EXTRA_DESCRIPTION);
+            Log.i("detailed_step_descr", currentDetailedDescription);
+
+            currentVideoStep = bundle.getString(EXTRA_VIDEOURL);
+            Log.i("detailed_step_link", currentVideoStep);
+
+            mDetailedDescription.setText(currentDetailedDescription);
+
+            mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                    currentStepNumber));
+            loadVideo(currentVideoStep);
+
+        } else {
+
         }
 
-        if (uriCurrentVideoStep == null) {
-//            Toast.makeText(getActivity(), getString(R.string.sample_not_found_error),
-//                    Toast.LENGTH_SHORT).show();
-            mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
-                    (getResources(), R.drawable.no_video));
-            return view;
-        } else {
-            // Initialize the player.
-            initializePlayer(uriCurrentVideoStep);
-            return view;
-        }
+
+        mStepForth.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int nextStepNo = getNextStepNo(currentStepNumberInt);
+
+                String[] nextStep = getNextPrevStep(nextStepNo);
+
+                mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                        nextStep[1]));
+
+                mDetailedDescription.setText(nextStep[3]);
+                loadVideo(nextStep[4]);
+
+            }
+        });
+
+        mStepBack = view.findViewById(R.id.step_back);
+
+
+
+        // String currentVideoUrl = intent.getStringExtra(StepsFragment.EXTRA_VIDEOURL);
+        // Initialize the Media Session.
+
+
+        return view;
     }
 
-    /**
-     * Shows Media Style notification, with actions that depend on the current MediaSession
-     * PlaybackState.
-     * @param state The PlaybackState of the MediaSession.
-     */
-//    private void showNotification(PlaybackStateCompat state) {
-//        Notification.Builder builder = new Notification.Builder(getActivity());
-//
-//        int icon;
-//        String play_pause;
-//        if(state.getState() == PlaybackStateCompat.STATE_PLAYING){
-//            icon = R.drawable.exo_controls_pause;
-//            play_pause = getString(R.string.pause);
-//        } else {
-//            icon = R.drawable.exo_controls_play;
-//            play_pause = getString(R.string.play);
-//        }
-//
-//
-//        Action playPauseAction = new Action(
-//                icon, play_pause,
-//                MediaButtonReceiver.buildMediaButtonPendingIntent(getActivity(),
-//                        PlaybackStateCompat.ACTION_PLAY_PAUSE));
-//
-//        Action restartAction = newAction(R.drawable.exo_controls_previous, getString(R.string.restart),
-//                MediaButtonReceiver.buildMediaButtonPendingIntent
-//                        (getActivity(), PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS));
-//
-//        PendingIntent contentPendingIntent = PendingIntent.getActivity
-//                (getActivity(), 0, new Intent(getActivity(), DetailedStepFragment.class), 0);
-//
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH) {
-//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//                builder.setContentTitle(getString(R.string.guess))
-//                        .setContentText(getString(R.string.notification_text))
-//                        .setContentIntent(contentPendingIntent)
-//                        .setSmallIcon(R.drawable.ic_music_note)
-//                        .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-//                        .addAction(restartAction)
-//                        .addAction(playPauseAction)
-//                        .setStyle(new MediaStyle()
-//                                .setMediaSession(mMediaSession.getSessionToken())
-//                                .setShowActionsInCompactView(0,1));
-//            }
-//        }
-//
-//
-//        mNotificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-//        mNotificationManager.notify(0, builder.build());
-//    }
 
     /**
      * Release ExoPlayer.
@@ -245,6 +231,30 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         }
     }
 
+    private void loadVideo(String stringUrl) {
+        URL url;
+        Uri uriCurrentVideoStep = null;
+        try {
+            url = new URL(stringUrl);
+            uriCurrentVideoStep = Uri.parse(url.toURI().toString());
+        } catch (MalformedURLException e1) {
+            e1.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        if (uriCurrentVideoStep == null) {
+//            Toast.makeText(getActivity(), getString(R.string.sample_not_found_error),
+//                    Toast.LENGTH_SHORT).show();
+            mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
+                    (getResources(), R.drawable.no_video));
+
+        } else {
+            // Initialize the player.
+            initializePlayer(uriCurrentVideoStep);
+        }
+
+    }
     /**
      * Release the player when the activity is destroyed.
      */
@@ -332,4 +342,37 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
     }
+
+    private int getNextStepNo(int currentStepNo) {
+        int nextStep;
+        nextStep = currentStepNo + 1;
+        return nextStep;
+    }
+
+    private int getPrevStepNo(int currentStepNo) {
+        int prevStep;
+        prevStep = currentStepNo + 1;
+        return prevStep;
+    }
+
+    private String[] getNextPrevStep(int prevNextStepNo) {
+        String[] prevNextStep = new String[5];
+
+        ArrayList<String[]> tempCurrentSteps = currentRecipeDetailsWithStepNo1;
+        for (int i = 0; i < tempCurrentSteps.size(); i++) {
+            String[] elements = tempCurrentSteps.get(i);
+            int stepNo = Integer.parseInt(elements[1]);
+
+            if (stepNo == prevNextStepNo) {
+                recipeNumber = Integer.parseInt(prevNextStep[0]);
+                stepNumber = Integer.parseInt(prevNextStep[1]);
+                shortDescription = prevNextStep[2];
+                detailedDescription = prevNextStep[3];
+                videoStep = prevNextStep[4];
+            }
+        }
+
+        return prevNextStep;
+    }
+
 }
