@@ -6,9 +6,10 @@ import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.constraint.ConstraintLayout;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -35,6 +37,7 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
+import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -67,8 +70,8 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
     private PlaybackStateCompat.Builder mStateBuilder;
     private NotificationManager mNotificationManager;
     private ArrayList<String[]> currentRecipeDetailsWithStepNo1 = new ArrayList<>();
-    private int recipeNumber;
-    private int stepNumber;
+    private String recipeNumber;
+    private String stepNumber;
     private String shortDescription;
     private String detailedDescription;
     private String videoStep;
@@ -79,7 +82,10 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
     private String mCurrentRecipeNoLabel;
     private TextView mStepForth;
     private TextView mStepBack;
-
+    private int maxNumberOfSteps;
+    private ImageView mNoVideoAvailabe;
+    private Uri uriCurrentVideoStep;
+    private ConstraintLayout.LayoutParams layoutParams;
 
 
     public DetailedStepFragment() {
@@ -93,12 +99,73 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         view = inflater.inflate(R.layout.fragment_detailed_step, container, false);
 
         currentRecipeDetailsWithStepNo1 = StepsFragment.currentRecipeDetailsWithStepNo;
+        maxNumberOfSteps = currentRecipeDetailsWithStepNo1.size();
+        Log.i("max number of steps", String.valueOf(maxNumberOfSteps));
+        layoutParams = new ConstraintLayout.LayoutParams(
+                ConstraintLayout.LayoutParams.MATCH_PARENT,
+                ConstraintLayout.LayoutParams.MATCH_PARENT
+        );
+
         // Initialize the player view.
         mPlayerView = view.findViewById(R.id.playerView);
+        mNoVideoAvailabe = view.findViewById(R.id.noVideoAvailable);
+        mNoVideoAvailabe.setVisibility(View.GONE);
+        Context context = mNoVideoAvailabe.getContext();
+        Picasso.with(context).load(R.drawable.no_video).into(mNoVideoAvailabe);
+
+
         mDetailedDescription = view.findViewById(R.id.detailed_description);
         mCurrentRecipeNoLabel = getResources().getString(R.string.current_step);
         mCurrentRecipeNo = view.findViewById(R.id.step_number);
         mStepForth = view.findViewById(R.id.step_forth);
+        mStepBack = view.findViewById(R.id.step_back);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mPlayerView.setVisibility(View.VISIBLE);
+            mDetailedDescription.setVisibility(View.VISIBLE);
+            mCurrentRecipeNo.setVisibility(View.VISIBLE);
+            mStepForth.setVisibility(View.VISIBLE);
+            mStepBack.setVisibility(View.VISIBLE);
+
+        } else {
+
+
+            if (uriCurrentVideoStep == null) {
+                mPlayerView.setVisibility(View.GONE);
+
+                mNoVideoAvailabe.setVisibility(View.VISIBLE);
+                mNoVideoAvailabe.setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+                mNoVideoAvailabe.setLayoutParams(layoutParams);
+
+            } else {
+                mNoVideoAvailabe.setVisibility(View.GONE);
+
+                mPlayerView.setVisibility(View.VISIBLE);
+                mPlayerView.setSystemUiVisibility(
+                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+
+                mPlayerView.setLayoutParams(layoutParams);
+            }
+
+
+            mDetailedDescription.setVisibility(View.GONE);
+            mCurrentRecipeNo.setVisibility(View.GONE);
+            mStepForth.setVisibility(View.GONE);
+            mStepBack.setVisibility(View.GONE);
+        }
+
 
         String currentStepNumber = "";
         String currentDetailedDescription = "";
@@ -117,13 +184,42 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
             currentVideoStep = bundle.getString(EXTRA_VIDEOURL);
             Log.i("detailed_step_link", currentVideoStep);
 
+            uriCurrentVideoStep = checkUrl(currentVideoStep);
+
             mDetailedDescription.setText(currentDetailedDescription);
 
-            mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-                    currentStepNumber));
-            loadVideo(currentVideoStep);
+
+            if (currentStepNumberInt == (maxNumberOfSteps - 1)) {
+                mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                        "Last Step"));
+                mStepForth.setVisibility(View.GONE);
+            } else if (currentStepNumberInt == 0) {
+                mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                        "Introduction"));
+                mStepBack.setVisibility(View.GONE);
+            } else {
+                mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                        currentStepNumber));
+            }
+
+
+            loadVideo(uriCurrentVideoStep);
 
         } else {
+//            currentStepNumber = String.valueOf(currentStepNumberInt);
+//            currentStepNumberInt = currentStepNumberInt;
+//
+//            currentDetailedDescription = bundle.getString(EXTRA_DESCRIPTION);
+//            Log.i("detailed_step_descr", currentDetailedDescription);
+//
+//            currentVideoStep = bundle.getString(EXTRA_VIDEOURL);
+//            Log.i("detailed_step_link", currentVideoStep);
+//
+//            mDetailedDescription.setText(currentDetailedDescription);
+//
+//            mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+//                    currentStepNumber));
+//            loadVideo(currentVideoStep);
 
         }
 
@@ -131,26 +227,48 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         mStepForth.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 int nextStepNo = getNextStepNo(currentStepNumberInt);
 
                 String[] nextStep = getNextPrevStep(nextStepNo);
+                int tempInt = Integer.parseInt(nextStep[1]);
 
-                mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-                        nextStep[1]));
-
+                if (tempInt == (maxNumberOfSteps - 1)) {
+                    mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                            "Last Step"));
+                    mStepForth.setVisibility(View.GONE);
+                } else {
+                    mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                            nextStep[1]));
+                }
                 mDetailedDescription.setText(nextStep[3]);
-                loadVideo(nextStep[4]);
-
+                Uri tempUrl = checkUrl(nextStep[4]);
+                loadVideo(tempUrl);
             }
         });
 
-        mStepBack = view.findViewById(R.id.step_back);
 
+        mStepBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int backStepNo = getPrevStepNo(currentStepNumberInt);
 
+                String[] backStep = getNextPrevStep(backStepNo);
+                int tempInt = Integer.parseInt(backStep[1]);
 
-        // String currentVideoUrl = intent.getStringExtra(StepsFragment.EXTRA_VIDEOURL);
-        // Initialize the Media Session.
-
+                if (tempInt == 0) {
+                    mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                            "Introduction"));
+                    mStepBack.setVisibility(View.GONE);
+                } else {
+                    mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                            backStep[1]));
+                }
+                mDetailedDescription.setText(backStep[3]);
+                Uri tempUrl = checkUrl(backStep[4]);
+                loadVideo(tempUrl);
+            }
+        });
 
         return view;
     }
@@ -231,7 +349,8 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         }
     }
 
-    private void loadVideo(String stringUrl) {
+    private Uri checkUrl(String stringUrl) {
+
         URL url;
         Uri uriCurrentVideoStep = null;
         try {
@@ -243,18 +362,33 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
             e.printStackTrace();
         }
 
-        if (uriCurrentVideoStep == null) {
+        return uriCurrentVideoStep;
+    }
+
+
+    private void loadVideo(Uri uri) {
+        releasePlayer();
+        initializeMediaSession();
+
+
+        if (uri == null) {
 //            Toast.makeText(getActivity(), getString(R.string.sample_not_found_error),
 //                    Toast.LENGTH_SHORT).show();
-            mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
-                    (getResources(), R.drawable.no_video));
+//            mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
+//                    (getResources(), R.drawable.no_video));
+            mPlayerView.setVisibility(View.GONE);
+            mNoVideoAvailabe.setVisibility(View.VISIBLE);
+
 
         } else {
+            mPlayerView.setVisibility(View.VISIBLE);
+            mNoVideoAvailabe.setVisibility(View.GONE);
             // Initialize the player.
             initializePlayer(uriCurrentVideoStep);
         }
 
     }
+
     /**
      * Release the player when the activity is destroyed.
      */
@@ -344,15 +478,32 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
     }
 
     private int getNextStepNo(int currentStepNo) {
-        int nextStep;
-        nextStep = currentStepNo + 1;
-        return nextStep;
+
+        if (currentStepNo == (maxNumberOfSteps - 1)) {
+            currentStepNumberInt = currentStepNo;
+            mStepForth.setVisibility(View.GONE);
+
+        } else {
+            currentStepNumberInt = currentStepNo + 1;
+            mStepForth.setVisibility(View.VISIBLE);
+            mStepBack.setVisibility(View.VISIBLE);
+        }
+
+        return currentStepNumberInt;
     }
 
     private int getPrevStepNo(int currentStepNo) {
-        int prevStep;
-        prevStep = currentStepNo + 1;
-        return prevStep;
+
+        if (currentStepNo == 0) {
+            currentStepNumberInt = currentStepNo;
+            mStepBack.setVisibility(View.GONE);
+
+        } else {
+            currentStepNumberInt = currentStepNo - 1;
+            mStepBack.setVisibility(View.VISIBLE);
+            mStepForth.setVisibility(View.VISIBLE);
+        }
+        return currentStepNumberInt;
     }
 
     private String[] getNextPrevStep(int prevNextStepNo) {
@@ -364,14 +515,13 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
             int stepNo = Integer.parseInt(elements[1]);
 
             if (stepNo == prevNextStepNo) {
-                recipeNumber = Integer.parseInt(prevNextStep[0]);
-                stepNumber = Integer.parseInt(prevNextStep[1]);
-                shortDescription = prevNextStep[2];
-                detailedDescription = prevNextStep[3];
-                videoStep = prevNextStep[4];
+                prevNextStep[0] = elements[0];
+                prevNextStep[1] = elements[1];
+                prevNextStep[2] = elements[2];
+                prevNextStep[3] = elements[3];
+                prevNextStep[4] = elements[4];
             }
         }
-
         return prevNextStep;
     }
 

@@ -44,16 +44,6 @@
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.0" />
 
-                <include
-                    android:id="@+id/part5"
-                    layout="@layout/detail_part5"
-                    android:layout_width="0dp"
-                    android:layout_height="match_parent"
-                    android:layout_marginTop="0dp"
-                    app:layout_constraintLeft_toLeftOf="parent"
-                    app:layout_constraintRight_toRightOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/part3"
-                    app:layout_constraintVertical_bias="0.0" />
 
             </android.support.constraint.ConstraintLayout>
 
