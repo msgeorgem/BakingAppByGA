@@ -3,6 +3,7 @@ package com.example.miner01.bakingappbyga;
 
 import android.app.FragmentManager;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -38,8 +39,11 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
         mStep = getResources().getString(R.string.step);
+
+        getSupportActionBar().hide();
 
         Intent intent = getIntent();
         if (intent == null) {

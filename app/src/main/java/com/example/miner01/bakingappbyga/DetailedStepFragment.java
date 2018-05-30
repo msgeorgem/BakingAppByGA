@@ -101,10 +101,7 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         currentRecipeDetailsWithStepNo1 = StepsFragment.currentRecipeDetailsWithStepNo;
         maxNumberOfSteps = currentRecipeDetailsWithStepNo1.size();
         Log.i("max number of steps", String.valueOf(maxNumberOfSteps));
-        layoutParams = new ConstraintLayout.LayoutParams(
-                ConstraintLayout.LayoutParams.MATCH_PARENT,
-                ConstraintLayout.LayoutParams.MATCH_PARENT
-        );
+
 
         // Initialize the player view.
         mPlayerView = view.findViewById(R.id.playerView);
@@ -130,33 +127,52 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         } else {
 
 
+//            DisplayMetrics displayMetrics = new DisplayMetrics();
+//
+//            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+//
+//            int width = displayMetrics.widthPixels;
+//            int height = displayMetrics.heightPixels;
+//
+//
+//            layoutParams = new ConstraintLayout.LayoutParams(
+//                    ConstraintLayout.LayoutParams.MATCH_PARENT,
+//                    ConstraintLayout.LayoutParams.MATCH_PARENT);
+
+
             if (uriCurrentVideoStep == null) {
                 mPlayerView.setVisibility(View.GONE);
 
                 mNoVideoAvailabe.setVisibility(View.VISIBLE);
-                mNoVideoAvailabe.setSystemUiVisibility(
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                    mNoVideoAvailabe.setSystemUiVisibility(
+//                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+//                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+//                }
+//
+//                mNoVideoAvailabe.setLayoutParams(layoutParams);
 
-                mNoVideoAvailabe.setLayoutParams(layoutParams);
 
             } else {
                 mNoVideoAvailabe.setVisibility(View.GONE);
 
                 mPlayerView.setVisibility(View.VISIBLE);
-                mPlayerView.setSystemUiVisibility(
-                        View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                                | View.SYSTEM_UI_FLAG_FULLSCREEN
-                                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+//                    mPlayerView.setSystemUiVisibility(
+//                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+//                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+//                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+//                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+//                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
+//                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+//                }
+//
+//                mPlayerView.setLayoutParams(layoutParams);
 
-                mPlayerView.setLayoutParams(layoutParams);
             }
 
 
@@ -384,7 +400,7 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
             mPlayerView.setVisibility(View.VISIBLE);
             mNoVideoAvailabe.setVisibility(View.GONE);
             // Initialize the player.
-            initializePlayer(uriCurrentVideoStep);
+            initializePlayer(uri);
         }
 
     }
