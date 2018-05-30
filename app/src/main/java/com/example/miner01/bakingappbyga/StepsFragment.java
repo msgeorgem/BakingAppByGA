@@ -3,6 +3,7 @@ package com.example.miner01.bakingappbyga;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.miner01.bakingappbyga.databinding.FragmentDetailedStepBinding;
 import com.example.miner01.bakingappbyga.databinding.FragmentStepsBinding;
 
 import java.util.ArrayList;
@@ -52,8 +52,7 @@ public class StepsFragment extends Fragment {
     private RecipeDetailAdapter.OnItemClickListener mListener;
     private RecipeDetailAdapter mAdapter = new RecipeDetailAdapter(currentRecipeDetailsWithStepNo, mListener);
     public static final String LOG_TAG = StepsFragment.class.getSimpleName();
-    private DetailedStepFragment mDetailedStepFragment;
-    private FragmentDetailedStepBinding mFragmentDetailedStepsBinding;
+
     private FragmentStepsBinding mFragmentStepsBinding;
 
     public StepsFragment() {
@@ -88,19 +87,17 @@ public class StepsFragment extends Fragment {
                 String detailedDescription = item[3];
                 String videoUrl = item[4];
 
-                Bundle bundle = new Bundle();
-                bundle.putString(EXTRA_DESCRIPTION, detailedDescription);
-                bundle.putString(EXTRA_VIDEOURL, videoUrl);
-                bundle.putString(EXTRA_STEP_NUMBER, stepNumber);
 
+                Intent intent1 = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    intent1 = new Intent(getContext(), DetailedStepActivity.class);
+                }
 
-                mDetailedStepFragment = new DetailedStepFragment();
-                mDetailedStepFragment.setArguments(bundle);
+                intent1.putExtra(EXTRA_DESCRIPTION, detailedDescription);
+                intent1.putExtra(EXTRA_VIDEOURL, videoUrl);
+                intent1.putExtra(EXTRA_STEP_NUMBER, stepNumber);
 
-                replaceFragment(mDetailedStepFragment);
-                mDetailBinding.part1.ingredients.setVisibility(View.GONE);
-                mDetailBinding.part2.stepsContainer.setVisibility(View.GONE);
-                mDetailBinding.part3.detailedStepContainer.setVisibility(View.VISIBLE);
+                startActivity(intent1);
             }
         };
 

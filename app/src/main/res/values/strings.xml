@@ -22,4 +22,5 @@
     <string name="current_step">Current Step</string>
     <string name="back_step">Step Back</string>
     <string name="step">Step</string>
+    <string name="title_activity_detailed_step">DetailedStepActivity</string>
 </resources>

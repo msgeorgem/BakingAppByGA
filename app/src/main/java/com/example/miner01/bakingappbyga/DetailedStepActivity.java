@@ -1,7 +1,5 @@
 package com.example.miner01.bakingappbyga;
 
-
-import android.app.Fragment;
 import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -13,10 +11,9 @@ import android.support.constraint.ConstraintLayout;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -49,22 +46,12 @@ import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_DESCRIPTION;
 import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_STEP_NUMBER;
 import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_VIDEOURL;
 
-
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link DetailedStepFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link DetailedStepFragment} factory method to
- * create an instance of this fragment.
- */
-
-public class DetailedStepFragment extends Fragment implements ExoPlayer.EventListener {
+public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer.EventListener {
 
 
-    public static final String TAG = DetailedStepFragment.class.getSimpleName();
-    private View view;
+    public static final String TAG = DetailedStepActivity.class.getSimpleName();
     private static MediaSessionCompat mMediaSession;
+    private View view;
     private SimpleExoPlayer mExoPlayer;
     private SimpleExoPlayerView mPlayerView;
     private PlaybackStateCompat.Builder mStateBuilder;
@@ -85,18 +72,14 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
     private int maxNumberOfSteps;
     private ImageView mNoVideoAvailabe;
     private Uri uriCurrentVideoStep;
+    private Uri mCurrentItemUri;
     private ConstraintLayout.LayoutParams layoutParams;
 
 
-    public DetailedStepFragment() {
-        // Required empty public constructor
-    }
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        view = inflater.inflate(R.layout.fragment_detailed_step, container, false);
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_detailed_step);
 
         currentRecipeDetailsWithStepNo1 = StepsFragment.currentRecipeDetailsWithStepNo;
         maxNumberOfSteps = currentRecipeDetailsWithStepNo1.size();
@@ -104,20 +87,24 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
 
 
         // Initialize the player view.
-        mPlayerView = view.findViewById(R.id.playerView);
-        mNoVideoAvailabe = view.findViewById(R.id.noVideoAvailable);
+        mPlayerView = findViewById(R.id.playerView);
+        mNoVideoAvailabe = findViewById(R.id.noVideoAvailable);
         mNoVideoAvailabe.setVisibility(View.GONE);
         Context context = mNoVideoAvailabe.getContext();
         Picasso.with(context).load(R.drawable.no_video).into(mNoVideoAvailabe);
 
-
-        mDetailedDescription = view.findViewById(R.id.detailed_description);
+        mDetailedDescription = findViewById(R.id.detailed_description);
         mCurrentRecipeNoLabel = getResources().getString(R.string.current_step);
-        mCurrentRecipeNo = view.findViewById(R.id.step_number);
-        mStepForth = view.findViewById(R.id.step_forth);
-        mStepBack = view.findViewById(R.id.step_back);
+        mCurrentRecipeNo = findViewById(R.id.step_number);
+        mStepForth = findViewById(R.id.step_forth);
+        mStepBack = findViewById(R.id.step_back);
+
+        String currentStepNumber = "";
+        String currentDetailedDescription = "";
+        String currentVideoStep = "";
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mDetailedDescription.setText(currentDetailedDescription);
             mPlayerView.setVisibility(View.VISIBLE);
             mDetailedDescription.setVisibility(View.VISIBLE);
             mCurrentRecipeNo.setVisibility(View.VISIBLE);
@@ -161,6 +148,7 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
                 mNoVideoAvailabe.setVisibility(View.GONE);
 
                 mPlayerView.setVisibility(View.VISIBLE);
+
 //                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
 //                    mPlayerView.setSystemUiVisibility(
 //                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
@@ -176,34 +164,33 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
             }
 
 
-            mDetailedDescription.setVisibility(View.GONE);
-            mCurrentRecipeNo.setVisibility(View.GONE);
-            mStepForth.setVisibility(View.GONE);
-            mStepBack.setVisibility(View.GONE);
+//            mDetailedDescription.setVisibility(View.GONE);
+//            mCurrentRecipeNo.setVisibility(View.GONE);
+//            mStepForth.setVisibility(View.GONE);
+//            mStepBack.setVisibility(View.GONE);
         }
 
 
-        String currentStepNumber = "";
-        String currentDetailedDescription = "";
-        String currentVideoStep = "";
-
         initializeMediaSession();
 
-        bundle = this.getArguments();
-        if (bundle != null) {
-            currentStepNumber = bundle.getString(EXTRA_STEP_NUMBER);
-            currentStepNumberInt = Integer.parseInt(bundle.getString(EXTRA_STEP_NUMBER));
+        // Examine the intent that was used to launch this activity,
+        // in order to figure out if we're creating a new item or editing an existing one.
+        Intent intent = getIntent();
 
-            currentDetailedDescription = bundle.getString(EXTRA_DESCRIPTION);
-            Log.i("detailed_step_descr", currentDetailedDescription);
+        currentStepNumber = intent.getStringExtra(EXTRA_STEP_NUMBER);
+        currentStepNumberInt = Integer.parseInt(intent.getStringExtra(EXTRA_STEP_NUMBER));
 
-            currentVideoStep = bundle.getString(EXTRA_VIDEOURL);
-            Log.i("detailed_step_link", currentVideoStep);
+        currentDetailedDescription = intent.getStringExtra(EXTRA_DESCRIPTION);
+        Log.i("detailed_step_descr", currentDetailedDescription);
 
-            uriCurrentVideoStep = checkUrl(currentVideoStep);
+        currentVideoStep = intent.getStringExtra(EXTRA_VIDEOURL);
+        Log.i("detailed_step_link", currentVideoStep);
 
+        uriCurrentVideoStep = checkUrl(currentVideoStep);
+
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             mDetailedDescription.setText(currentDetailedDescription);
-
 
             if (currentStepNumberInt == (maxNumberOfSteps - 1)) {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
@@ -217,76 +204,57 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                         currentStepNumber));
             }
+        }
+        loadVideo(uriCurrentVideoStep);
+
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+            mStepForth.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+
+                    int nextStepNo = getNextStepNo(currentStepNumberInt);
+
+                    String[] nextStep = getNextPrevStep(nextStepNo);
+                    int tempInt = Integer.parseInt(nextStep[1]);
+
+                    if (tempInt == (maxNumberOfSteps - 1)) {
+                        mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                                "Last Step"));
+                        mStepForth.setVisibility(View.GONE);
+                    } else {
+                        mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                                nextStep[1]));
+                    }
+                    mDetailedDescription.setText(nextStep[3]);
+                    Uri tempUrl = checkUrl(nextStep[4]);
+                    loadVideo(tempUrl);
+                }
+            });
 
 
-            loadVideo(uriCurrentVideoStep);
+            mStepBack.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int backStepNo = getPrevStepNo(currentStepNumberInt);
 
-        } else {
-//            currentStepNumber = String.valueOf(currentStepNumberInt);
-//            currentStepNumberInt = currentStepNumberInt;
-//
-//            currentDetailedDescription = bundle.getString(EXTRA_DESCRIPTION);
-//            Log.i("detailed_step_descr", currentDetailedDescription);
-//
-//            currentVideoStep = bundle.getString(EXTRA_VIDEOURL);
-//            Log.i("detailed_step_link", currentVideoStep);
-//
-//            mDetailedDescription.setText(currentDetailedDescription);
-//
-//            mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-//                    currentStepNumber));
-//            loadVideo(currentVideoStep);
+                    String[] backStep = getNextPrevStep(backStepNo);
+                    int tempInt = Integer.parseInt(backStep[1]);
 
+                    if (tempInt == 0) {
+                        mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                                "Introduction"));
+                        mStepBack.setVisibility(View.GONE);
+                    } else {
+                        mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
+                                backStep[1]));
+                    }
+                    mDetailedDescription.setText(backStep[3]);
+                    Uri tempUrl = checkUrl(backStep[4]);
+                    loadVideo(tempUrl);
+                }
+            });
         }
 
-
-        mStepForth.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-                int nextStepNo = getNextStepNo(currentStepNumberInt);
-
-                String[] nextStep = getNextPrevStep(nextStepNo);
-                int tempInt = Integer.parseInt(nextStep[1]);
-
-                if (tempInt == (maxNumberOfSteps - 1)) {
-                    mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-                            "Last Step"));
-                    mStepForth.setVisibility(View.GONE);
-                } else {
-                    mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-                            nextStep[1]));
-                }
-                mDetailedDescription.setText(nextStep[3]);
-                Uri tempUrl = checkUrl(nextStep[4]);
-                loadVideo(tempUrl);
-            }
-        });
-
-
-        mStepBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int backStepNo = getPrevStepNo(currentStepNumberInt);
-
-                String[] backStep = getNextPrevStep(backStepNo);
-                int tempInt = Integer.parseInt(backStep[1]);
-
-                if (tempInt == 0) {
-                    mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-                            "Introduction"));
-                    mStepBack.setVisibility(View.GONE);
-                } else {
-                    mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-                            backStep[1]));
-                }
-                mDetailedDescription.setText(backStep[3]);
-                Uri tempUrl = checkUrl(backStep[4]);
-                loadVideo(tempUrl);
-            }
-        });
-
-        return view;
     }
 
 
@@ -311,7 +279,7 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
     private void initializeMediaSession() {
 
         // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(getActivity(), TAG);
+        mMediaSession = new MediaSessionCompat(this, TAG);
 
         // Enable callbacks from MediaButtons and TransportControls.
         mMediaSession.setFlags(
@@ -333,7 +301,7 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
 
 
         // MySessionCallback has methods that handle callbacks from a media controller.
-        mMediaSession.setCallback(new MySessionCallback());
+        mMediaSession.setCallback(new DetailedStepActivity.MySessionCallback());
 
         // Start the Media Session since the activity is active.
         mMediaSession.setActive(true);
@@ -350,16 +318,16 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
             LoadControl loadControl = new DefaultLoadControl();
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector, loadControl);
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
             mPlayerView.setPlayer(mExoPlayer);
 
             // Set the ExoPlayer.EventListener to this activity.
             mExoPlayer.addListener(this);
 
             // Prepare the MediaSource.
-            String userAgent = Util.getUserAgent(getActivity(), "ClassicalMusicQuiz");
+            String userAgent = Util.getUserAgent(this, "ClassicalMusicQuiz");
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
+                    this, userAgent), new DefaultExtractorsFactory(), null, null);
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
         }
@@ -454,45 +422,6 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
 
     }
 
-    /**
-     * Broadcast Receiver registered to receive the MEDIA_BUTTON intent coming from clients.
-     */
-    public static class MediaReceiver extends BroadcastReceiver {
-
-        public MediaReceiver() {
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            MediaButtonReceiver.handleIntent(mMediaSession, intent);
-        }
-    }
-
-    /**
-     * Media Session Callbacks, where all external clients control the player.
-     */
-    private class MySessionCallback extends MediaSessionCompat.Callback {
-        @Override
-        public void onPlay() {
-            mExoPlayer.setPlayWhenReady(true);
-        }
-
-        @Override
-        public void onPause() {
-            mExoPlayer.setPlayWhenReady(false);
-        }
-
-        @Override
-        public void onSkipToPrevious() {
-            mExoPlayer.seekTo(0);
-        }
-    }
-
-    public interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onFragmentInteraction(Uri uri);
-    }
-
     private int getNextStepNo(int currentStepNo) {
 
         if (currentStepNo == (maxNumberOfSteps - 1)) {
@@ -540,5 +469,45 @@ public class DetailedStepFragment extends Fragment implements ExoPlayer.EventLis
         }
         return prevNextStep;
     }
+
+    public interface OnFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onFragmentInteraction(Uri uri);
+    }
+
+    /**
+     * Broadcast Receiver registered to receive the MEDIA_BUTTON intent coming from clients.
+     */
+    public static class MediaReceiver extends BroadcastReceiver {
+
+        public MediaReceiver() {
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MediaButtonReceiver.handleIntent(mMediaSession, intent);
+        }
+    }
+
+    /**
+     * Media Session Callbacks, where all external clients control the player.
+     */
+    private class MySessionCallback extends MediaSessionCompat.Callback {
+        @Override
+        public void onPlay() {
+            mExoPlayer.setPlayWhenReady(true);
+        }
+
+        @Override
+        public void onPause() {
+            mExoPlayer.setPlayWhenReady(false);
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            mExoPlayer.seekTo(0);
+        }
+    }
+
 
 }
