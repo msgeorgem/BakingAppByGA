@@ -77,29 +77,49 @@ public class StepsFragment extends Fragment {
         currentRecipeDetailsWithStepNo = getCurrentRecipeDetailsWithStepNo();
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
 
+        // Tablet code
+        if (MainActivity.is7InchTablet) {
+            mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.just_click_step));
+            mListener = new RecipeDetailAdapter.OnItemClickListener() {
 
-        mListener = new RecipeDetailAdapter.OnItemClickListener() {
+                @Override
+                public void onItemClick(String[] item) {
 
-            @Override
-            public void onItemClick(String[] item) {
+                    String stepNumber = item[1];
+                    String detailedDescription = item[3];
+                    String videoUrl = item[4];
 
-                String stepNumber = item[1];
-                String detailedDescription = item[3];
-                String videoUrl = item[4];
+                    mDetailBinding.part3.detailedDescription.setText(detailedDescription);
 
-
-                Intent intent1 = null;
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-                    intent1 = new Intent(getContext(), DetailedStepActivity.class);
                 }
+            };
 
-                intent1.putExtra(EXTRA_DESCRIPTION, detailedDescription);
-                intent1.putExtra(EXTRA_VIDEOURL, videoUrl);
-                intent1.putExtra(EXTRA_STEP_NUMBER, stepNumber);
 
-                startActivity(intent1);
-            }
-        };
+        } else {
+            mListener = new RecipeDetailAdapter.OnItemClickListener() {
+
+                @Override
+                public void onItemClick(String[] item) {
+
+                    String stepNumber = item[1];
+                    String detailedDescription = item[3];
+                    String videoUrl = item[4];
+
+
+                    Intent intent1 = null;
+                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                        intent1 = new Intent(getContext(), DetailedStepActivity.class);
+                    }
+
+                    intent1.putExtra(EXTRA_DESCRIPTION, detailedDescription);
+                    intent1.putExtra(EXTRA_VIDEOURL, videoUrl);
+                    intent1.putExtra(EXTRA_STEP_NUMBER, stepNumber);
+
+                    startActivity(intent1);
+                }
+            };
+        }
+
 
         mAdapter = new RecipeDetailAdapter(currentRecipeDetailsWithStepNo, mListener);
 

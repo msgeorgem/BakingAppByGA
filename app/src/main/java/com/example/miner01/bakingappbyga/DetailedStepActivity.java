@@ -1,12 +1,9 @@
 package com.example.miner01.bakingappbyga;
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -144,13 +141,12 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             if (currentStepNumberInt == (maxNumberOfSteps - 1)) {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                         getResources().getString(R.string.last_step)));
-//                mStepForth.setVisibility(View.GONE);
+
                 mStepForthFrame.setVisibility(View.GONE);
             } else if (currentStepNumberInt == 0) {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                         getResources().getString(R.string.introduction)));
                 mStepBackFrame.setVisibility(View.GONE);
-//                mStepBack.setVisibility(View.GONE);
             } else {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                         currentStepNumberInt));
@@ -242,7 +238,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     /**
      * Release ExoPlayer.
      */
-    private void releasePlayer() {
+    public void releasePlayer() {
 //        mNotificationManager.cancelAll();
         if ((mExoPlayer != null)) {
             mExoPlayer.stop();
@@ -257,7 +253,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
      * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
      * and media controller.
      */
-    private void initializeMediaSession() {
+    public void initializeMediaSession() {
 
         // Create a MediaSessionCompat.
         mMediaSession = new MediaSessionCompat(this, TAG);
@@ -294,7 +290,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
      *
      * @param mediaUri The URI of the sample to play.
      */
-    private void initializePlayer(Uri mediaUri) {
+    public void initializePlayer(Uri mediaUri) {
         if (mExoPlayer == null) {
             // Create an instance of the ExoPlayer.
             TrackSelector trackSelector = new DefaultTrackSelector();
@@ -314,7 +310,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         }
     }
 
-    private Uri checkUrl(String stringUrl) {
+    public Uri checkUrl(String stringUrl) {
 
         URL url;
         Uri uriCurrentVideoStep = null;
@@ -330,8 +326,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         return uriCurrentVideoStep;
     }
 
-
-    private void loadVideo(Uri uri) {
+    public void loadVideo(Uri uri) {
         releasePlayer();
         initializeMediaSession();
 
@@ -448,19 +443,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         void onFragmentInteraction(Uri uri);
     }
 
-    /**
-     * Broadcast Receiver registered to receive the MEDIA_BUTTON intent coming from clients.
-     */
-    public static class MediaReceiver extends BroadcastReceiver {
-
-        public MediaReceiver() {
-        }
-
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            MediaButtonReceiver.handleIntent(mMediaSession, intent);
-        }
-    }
 
     /**
      * Media Session Callbacks, where all external clients control the player.

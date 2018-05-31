@@ -2,9 +2,10 @@ package com.example.miner01.bakingappbyga;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -13,6 +14,8 @@ import com.example.miner01.bakingappbyga.Utils.JsonString;
 import com.example.miner01.bakingappbyga.Utils.JsonUtils;
 
 import java.util.ArrayList;
+
+import static android.content.res.Configuration.SCREENLAYOUT_SIZE_XLARGE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -24,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     public static Context context;
     private ArrayList<Recipes> recipesList = new ArrayList<>();
     private RecyclerView recipesRecyclerView;
+    public static int sizeXLarge;
+    public static boolean is7InchTablet;
     /**
      * Adapter for the list of recipes
      */
@@ -41,10 +46,26 @@ public class MainActivity extends AppCompatActivity {
         recipesRecyclerView = findViewById(R.id.list_item);
         recipesList = JsonUtils.parseRecipesJson(JsonString.strJson);
 
-        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-            recipesRecyclerView.setLayoutManager(new GridLayoutManager(context, 1));
+        sizeXLarge = SCREENLAYOUT_SIZE_XLARGE; // For 10" tablet
+        is7InchTablet = context.getResources().getConfiguration()
+                .isLayoutSizeAtLeast(sizeXLarge);
+
+
+        if (is7InchTablet) {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                recipesRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+            } else {
+                recipesRecyclerView.setLayoutManager(new GridLayoutManager(context, 3));
+            }
         } else {
-            recipesRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+
+            if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
+                recipesRecyclerView.setLayoutManager(new GridLayoutManager(context, 1));
+            } else {
+                recipesRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
+            }
+
         }
         mListener = new RecipeMainAdapter.OnItemClickListener() {
 
@@ -68,6 +89,8 @@ public class MainActivity extends AppCompatActivity {
         // so the list can be populated in the user interface
         recipesRecyclerView.setAdapter(mAdapter);
         recipesRecyclerView.setItemAnimator(new DefaultItemAnimator());
+
+
     }
 
 }

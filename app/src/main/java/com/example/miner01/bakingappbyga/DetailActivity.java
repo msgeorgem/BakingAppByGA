@@ -37,12 +37,17 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
     public static String mStep;
     private TextView mTitle;
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+
+        if (MainActivity.is7InchTablet) {
+//            mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.just_click_step));
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        }
+
+
         mStep = getResources().getString(R.string.step);
 
         getSupportActionBar().hide();
@@ -52,7 +57,6 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
             closeOnError();
         }
         mCurrentItemUri = intent.getData();
-
 
         recipes = JsonUtils1.parseRecipesJson(JsonString.strJson);
 
@@ -95,16 +99,13 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         mDetailBinding.part2.stepsContainer.setVisibility(View.VISIBLE);
 //            mDetailBinding.part5.detailNavigationTemp.setVisibility(View.GONE);
 
-
         mStepsFragment = new StepsFragment();
         FragmentManager managerA = getFragmentManager();
         managerA.beginTransaction()
                 .replace(mDetailBinding.part2.stepsContainer.getId(), mStepsFragment, mStepsFragment.getTag())
                 .commit();
 
-
     }
-
 
     @Override
     public void onFragmentInteraction(Uri uri) {
