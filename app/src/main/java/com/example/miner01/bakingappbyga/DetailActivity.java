@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.miner01.bakingappbyga.Utils.JsonString;
@@ -34,6 +35,7 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
     private List<String[]> currentRecipeIngredients = new ArrayList<>();
     private Uri mCurrentItemUri;
     public static String mStep;
+    private TextView mTitle;
 
 
     @Override
@@ -55,6 +57,8 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         recipes = JsonUtils1.parseRecipesJson(JsonString.strJson);
 
         currentRecipeID = intent.getStringExtra(MainActivity.EXTRA_ID);
+        mTitle = findViewById(R.id.recipe_title);
+        mTitle.setText(intent.getStringExtra(MainActivity.EXTRA_NAME));
 //        currentRecipeIDInt = Integer.parseInt(currentRecipeID);
 
         Log.i("detail activity", currentRecipeID);

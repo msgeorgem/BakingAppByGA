@@ -26,5 +26,5 @@
     <string name="title_activity_detailed_step">DetailedStepActivity</string>
     <string name="introduction">Introduction</string>
     <string name="last_step">Last Step</string>
-    <string name="ingredients">Ingredients</string>
+    <string name="ingredients">Ingredients &amp; Steps</string>
 </resources>
