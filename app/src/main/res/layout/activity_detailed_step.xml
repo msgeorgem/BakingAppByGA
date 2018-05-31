@@ -41,54 +41,61 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent">
 
-                <TextView
-                    android:id="@+id/step_back"
-                    android:layout_width="0dp"
+                <FrameLayout
+                    android:id="@+id/step_back_frame"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="0.25"
-                    android:gravity="center"
-                    android:text="@string/back_step"
-                    android:textAllCaps="true"
                     android:layout_margin="@dimen/layout_margin_04"
                     android:background="#fff"
-                    android:elevation="@dimen/layout_elevation_08"
-                    android:textSize="18sp" />
+                    android:elevation="@dimen/layout_elevation_08">
+
+                    <TextView
+                        android:id="@+id/step_back"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ripple_effect"
+                        android:gravity="center"
+                        android:padding="@dimen/layout_margin_02"
+                        android:text="@string/back_step"
+                        android:textAllCaps="true"
+                        android:textSize="18sp" />
+                </FrameLayout>
 
                 <TextView
                     android:id="@+id/step_number"
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
+                    android:layout_margin="@dimen/layout_margin_04"
                     android:layout_marginLeft="8dp"
                     android:layout_marginRight="8dp"
                     android:layout_marginStart="8dp"
                     android:layout_weight="0.5"
+                    android:background="#fff"
+                    android:elevation="@dimen/layout_elevation_08"
                     android:gravity="center"
                     android:text="@string/current_step"
                     android:textAllCaps="true"
-                    android:layout_margin="@dimen/layout_margin_04"
-                    android:background="#fff"
-                    android:elevation="@dimen/layout_elevation_08"
                     android:textSize="18sp" />
 
-                <TextView
-                    android:id="@+id/step_forth"
-                    android:layout_width="0dp"
+                <FrameLayout
+                    android:id="@+id/step_forth_frame"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
-                    android:layout_marginLeft="8dp"
-                    android:layout_marginRight="8dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="0.25"
-                    android:gravity="center"
-                    android:text="@string/next_step"
-                    android:textAllCaps="true"
                     android:layout_margin="@dimen/layout_margin_04"
-
                     android:background="#fff"
-                    android:elevation="@dimen/layout_elevation_08"
-                    android:textSize="18sp" />
+                    android:elevation="@dimen/layout_elevation_08">
+
+                    <TextView
+                        android:id="@+id/step_forth"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="@drawable/ripple_effect"
+                        android:gravity="center"
+                        android:padding="@dimen/layout_margin_02"
+                        android:text="@string/next_step"
+                        android:textAllCaps="true"
+                        android:textSize="18sp" />
+                </FrameLayout>
             </LinearLayout>
         </FrameLayout>
 

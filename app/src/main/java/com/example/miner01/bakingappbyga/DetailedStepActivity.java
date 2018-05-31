@@ -1,13 +1,11 @@
 package com.example.miner01.bakingappbyga;
 
-import android.app.NotificationManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.constraint.ConstraintLayout;
 import android.support.v4.media.session.MediaButtonReceiver;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
@@ -15,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -47,35 +46,25 @@ import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_VIDEOURL;
 
 public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer.EventListener {
 
-    private static final String BUNDLE_RECYCLER_LAYOUT = "DetailStepActivity";
     public static final String TAG = DetailedStepActivity.class.getSimpleName();
     private static MediaSessionCompat mMediaSession;
-    private View view;
     private SimpleExoPlayer mExoPlayer;
     private SimpleExoPlayerView mPlayerView;
     private PlaybackStateCompat.Builder mStateBuilder;
-    private NotificationManager mNotificationManager;
     private ArrayList<String[]> currentRecipeDetailsWithStepNo1 = new ArrayList<>();
-    private String recipeNumber;
-    private String stepNumber;
-    private String shortDescription;
-    private String detailedDescription;
-    private String videoStep;
     private int currentStepNumberInt;
     private String currentDetailedDescription;
-    private Bundle bundle;
     private TextView mCurrentRecipeNo;
     private TextView mDetailedDescription;
     private String mCurrentRecipeNoLabel;
     private TextView mStepForth;
     private TextView mStepBack;
+    private FrameLayout mStepBackFrame;
+    private FrameLayout mStepForthFrame;
+    private FrameLayout mPlayerViewFrame;
     private int maxNumberOfSteps;
     private TextView mNoVideoAvailabe;
     private Uri uriCurrentVideoStep;
-
-    private Uri mCurrentItemUri;
-    private Uri tempUrl;
-    private ConstraintLayout.LayoutParams layoutParams;
 
 
     @Override
@@ -93,16 +82,17 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
 
         // Initialize the player view.
         mPlayerView = findViewById(R.id.playerView);
+        mPlayerViewFrame = findViewById(R.id.playerViewFrame);
         mNoVideoAvailabe = findViewById(R.id.noVideoAvailable);
-        mNoVideoAvailabe.setVisibility(View.GONE);
-//        Context context = mNoVideoAvailabe.getContext();
-//        Picasso.with(context).load(R.drawable.no_video).into(mNoVideoAvailabe);
+//        mNoVideoAvailabe.setVisibility(View.GONE);
 
         mDetailedDescription = findViewById(R.id.detailed_description);
         mCurrentRecipeNoLabel = getResources().getString(R.string.current_step);
         mCurrentRecipeNo = findViewById(R.id.step_number);
         mStepForth = findViewById(R.id.step_forth);
         mStepBack = findViewById(R.id.step_back);
+        mStepBackFrame = findViewById(R.id.step_back_frame);
+        mStepForthFrame = findViewById(R.id.step_forth_frame);
 
         currentDetailedDescription = "";
         String currentVideoStep = "";
@@ -136,12 +126,15 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
 
             if (uriCurrentVideoStep == null) {
                 mPlayerView.setVisibility(View.GONE);
+                mPlayerViewFrame.setVisibility(View.GONE);
                 mNoVideoAvailabe.setVisibility(View.VISIBLE);
                 mNoVideoAvailabe.setText(getResources().getString(R.string.no_video_available));
 
             } else {
+
                 mNoVideoAvailabe.setVisibility(View.GONE);
                 mPlayerView.setVisibility(View.VISIBLE);
+                mPlayerViewFrame.setVisibility(View.VISIBLE);
             }
         }
 
@@ -151,11 +144,13 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             if (currentStepNumberInt == (maxNumberOfSteps - 1)) {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                         getResources().getString(R.string.last_step)));
-                mStepForth.setVisibility(View.GONE);
+//                mStepForth.setVisibility(View.GONE);
+                mStepForthFrame.setVisibility(View.GONE);
             } else if (currentStepNumberInt == 0) {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                         getResources().getString(R.string.introduction)));
-                mStepBack.setVisibility(View.GONE);
+                mStepBackFrame.setVisibility(View.GONE);
+//                mStepBack.setVisibility(View.GONE);
             } else {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                         currentStepNumberInt));
@@ -177,9 +172,14 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                         mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                                 "Last Step"));
                         mStepForth.setVisibility(View.GONE);
+                        mStepBack.setVisibility(View.VISIBLE);
+                        mStepBackFrame.setVisibility(View.VISIBLE);
                     } else {
                         mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                                 nextStep[1]));
+                        mStepBack.setVisibility(View.VISIBLE);
+                        mStepBackFrame.setVisibility(View.VISIBLE);
+
                     }
                     currentDetailedDescription = nextStep[3];
                     mDetailedDescription.setText(currentDetailedDescription);
@@ -192,6 +192,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             mStepBack.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
+//                    buttonEffect(mStepBack);
                     int backStepNo = getPrevStepNo(currentStepNumberInt);
 
                     String[] backStep = getNextPrevStep(backStepNo);
@@ -201,9 +202,13 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                         mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                                 "Introduction"));
                         mStepBack.setVisibility(View.GONE);
+                        mStepForth.setVisibility(View.VISIBLE);
+                        mStepForthFrame.setVisibility(View.VISIBLE);
                     } else {
                         mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                                 backStep[1]));
+                        mStepForth.setVisibility(View.VISIBLE);
+                        mStepForthFrame.setVisibility(View.VISIBLE);
                     }
                     currentDetailedDescription = backStep[3];
                     mDetailedDescription.setText(currentDetailedDescription);
@@ -213,6 +218,26 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             });
         }
     }
+//    public static void buttonEffect(View button){
+//        button.setOnTouchListener(new View.OnTouchListener() {
+//
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN: {
+//                        v.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
+//                        v.invalidate();
+//                        break;
+//                    }
+//                    case MotionEvent.ACTION_UP: {
+//                        v.getBackground().clearColorFilter();
+//                        v.invalidate();
+//                        break;
+//                    }
+//                }
+//                return false;
+//            }
+//        });
+//    }
 
     /**
      * Release ExoPlayer.
