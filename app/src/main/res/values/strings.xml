@@ -22,5 +22,9 @@
     <string name="current_step">Current Step</string>
     <string name="back_step">Step Back</string>
     <string name="step">Step</string>
+    <string name="no_video_available">No Video Available</string>
     <string name="title_activity_detailed_step">DetailedStepActivity</string>
+    <string name="introduction">Introduction</string>
+    <string name="last_step">Last Step</string>
+    <string name="ingredients">Ingredients</string>
 </resources>

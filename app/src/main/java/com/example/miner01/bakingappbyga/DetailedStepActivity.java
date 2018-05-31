@@ -15,7 +15,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.DefaultLoadControl;
@@ -35,7 +34,6 @@ import com.google.android.exoplayer2.trackselection.TrackSelector;
 import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
 import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
 import com.google.android.exoplayer2.util.Util;
-import com.squareup.picasso.Picasso;
 
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
@@ -72,7 +70,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     private TextView mStepForth;
     private TextView mStepBack;
     private int maxNumberOfSteps;
-    private ImageView mNoVideoAvailabe;
+    private TextView mNoVideoAvailabe;
     private Uri uriCurrentVideoStep;
 
     private Uri mCurrentItemUri;
@@ -97,8 +95,8 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         mPlayerView = findViewById(R.id.playerView);
         mNoVideoAvailabe = findViewById(R.id.noVideoAvailable);
         mNoVideoAvailabe.setVisibility(View.GONE);
-        Context context = mNoVideoAvailabe.getContext();
-        Picasso.with(context).load(R.drawable.no_video).into(mNoVideoAvailabe);
+//        Context context = mNoVideoAvailabe.getContext();
+//        Picasso.with(context).load(R.drawable.no_video).into(mNoVideoAvailabe);
 
         mDetailedDescription = findViewById(R.id.detailed_description);
         mCurrentRecipeNoLabel = getResources().getString(R.string.current_step);
@@ -139,6 +137,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             if (uriCurrentVideoStep == null) {
                 mPlayerView.setVisibility(View.GONE);
                 mNoVideoAvailabe.setVisibility(View.VISIBLE);
+                mNoVideoAvailabe.setText(getResources().getString(R.string.no_video_available));
 
             } else {
                 mNoVideoAvailabe.setVisibility(View.GONE);
@@ -151,11 +150,11 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
 
             if (currentStepNumberInt == (maxNumberOfSteps - 1)) {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-                        "Last Step"));
+                        getResources().getString(R.string.last_step)));
                 mStepForth.setVisibility(View.GONE);
             } else if (currentStepNumberInt == 0) {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-                        "Introduction"));
+                        getResources().getString(R.string.introduction)));
                 mStepBack.setVisibility(View.GONE);
             } else {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,

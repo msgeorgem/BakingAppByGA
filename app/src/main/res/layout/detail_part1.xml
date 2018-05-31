@@ -7,18 +7,38 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:id="@+id/ingr_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/colorPrimary"
+            android:elevation="@dimen/layout_elevation_08"
+            android:fontFamily="cursive"
+            android:gravity="start|center_vertical"
+            android:paddingTop="@dimen/layout_margin_04"
+            android:text="@string/ingredients"
+            android:textAlignment="center"
+            android:textColor="#FFFFFF"
+            android:textSize="30sp"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/ingredients"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_margin="@dimen/layout_margin_16"
+            android:background="@color/colorPrimary"
+            android:elevation="@dimen/layout_elevation_08"
+            android:paddingBottom="@dimen/layout_margin_04"
+            android:paddingLeft="@dimen/layout_margin_16"
             android:gravity="start|center_vertical"
-            android:textAllCaps="true"
             android:textSize="18sp"
+            android:paddingRight="@dimen/layout_margin_16"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
-            android:background="#fff"
-            android:elevation="@dimen/layout_elevation_16"
-            app:layout_constraintTop_toTopOf="parent" />
+            android:paddingTop="@dimen/layout_margin_04"
+            android:textColor="#FFFFFF"
+            app:layout_constraintTop_toBottomOf="@+id/ingr_title" />
 
     </android.support.constraint.ConstraintLayout>
 </layout>
