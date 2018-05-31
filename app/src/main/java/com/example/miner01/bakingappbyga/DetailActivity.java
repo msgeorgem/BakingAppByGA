@@ -49,6 +49,8 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         if (MainActivity.is7InchTablet) {
 //            mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.just_click_step));
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        } else {
+            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
 
