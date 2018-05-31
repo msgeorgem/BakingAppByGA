@@ -5,11 +5,15 @@
     android:layout_height="50dp"
     android:clickable="true"
     android:focusable="true"
+    android:layout_margin="@dimen/layout_margin_04"
+    android:background="#fff"
+    android:elevation="@dimen/layout_elevation_04"
     android:orientation="horizontal">
 
     <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@drawable/ripple_effect">
 
         <android.support.constraint.Guideline
             android:id="@+id/vertical_middle"

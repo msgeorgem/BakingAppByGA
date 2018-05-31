@@ -14,6 +14,7 @@ import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -48,7 +49,7 @@ import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_VIDEOURL;
 
 public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer.EventListener {
 
-
+    private static final String BUNDLE_RECYCLER_LAYOUT = "DetailStepActivity";
     public static final String TAG = DetailedStepActivity.class.getSimpleName();
     private static MediaSessionCompat mMediaSession;
     private View view;
@@ -63,6 +64,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     private String detailedDescription;
     private String videoStep;
     private int currentStepNumberInt;
+    private String currentDetailedDescription;
     private Bundle bundle;
     private TextView mCurrentRecipeNo;
     private TextView mDetailedDescription;
@@ -72,7 +74,9 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     private int maxNumberOfSteps;
     private ImageView mNoVideoAvailabe;
     private Uri uriCurrentVideoStep;
+
     private Uri mCurrentItemUri;
+    private Uri tempUrl;
     private ConstraintLayout.LayoutParams layoutParams;
 
 
@@ -81,10 +85,13 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_step);
 
+        if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                    WindowManager.LayoutParams.FLAG_FULLSCREEN);
+        }
         currentRecipeDetailsWithStepNo1 = StepsFragment.currentRecipeDetailsWithStepNo;
         maxNumberOfSteps = currentRecipeDetailsWithStepNo1.size();
         Log.i("max number of steps", String.valueOf(maxNumberOfSteps));
-
 
         // Initialize the player view.
         mPlayerView = findViewById(R.id.playerView);
@@ -99,9 +106,25 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         mStepForth = findViewById(R.id.step_forth);
         mStepBack = findViewById(R.id.step_back);
 
-        String currentStepNumber = "";
-        String currentDetailedDescription = "";
+        currentDetailedDescription = "";
         String currentVideoStep = "";
+
+        initializeMediaSession();
+
+        Intent intent = getIntent();
+
+        if (savedInstanceState == null) {
+            currentVideoStep = intent.getStringExtra(EXTRA_VIDEOURL);
+            Log.i("detailed_step_link", currentVideoStep);
+            uriCurrentVideoStep = checkUrl(currentVideoStep);
+            currentDetailedDescription = intent.getStringExtra(EXTRA_DESCRIPTION);
+            Log.i("detailed_step_descr", currentDetailedDescription);
+            currentStepNumberInt = Integer.parseInt(intent.getStringExtra(EXTRA_STEP_NUMBER));
+        } else {
+            uriCurrentVideoStep = checkUrl(savedInstanceState.getString("video"));
+            currentStepNumberInt = savedInstanceState.getInt("number");
+            currentDetailedDescription = savedInstanceState.getString("description");
+        }
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             mDetailedDescription.setText(currentDetailedDescription);
@@ -113,81 +136,15 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
 
         } else {
 
-
-//            DisplayMetrics displayMetrics = new DisplayMetrics();
-//
-//            getActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
-//
-//            int width = displayMetrics.widthPixels;
-//            int height = displayMetrics.heightPixels;
-//
-//
-//            layoutParams = new ConstraintLayout.LayoutParams(
-//                    ConstraintLayout.LayoutParams.MATCH_PARENT,
-//                    ConstraintLayout.LayoutParams.MATCH_PARENT);
-
-
             if (uriCurrentVideoStep == null) {
                 mPlayerView.setVisibility(View.GONE);
-
                 mNoVideoAvailabe.setVisibility(View.VISIBLE);
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//                    mNoVideoAvailabe.setSystemUiVisibility(
-//                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-//                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-//                }
-//
-//                mNoVideoAvailabe.setLayoutParams(layoutParams);
-
 
             } else {
                 mNoVideoAvailabe.setVisibility(View.GONE);
-
                 mPlayerView.setVisibility(View.VISIBLE);
-
-//                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-//                    mPlayerView.setSystemUiVisibility(
-//                            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-//                                    | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-//                                    | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-//                                    | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-//                                    | View.SYSTEM_UI_FLAG_FULLSCREEN
-//                                    | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
-//                }
-//
-//                mPlayerView.setLayoutParams(layoutParams);
-
             }
-
-
-//            mDetailedDescription.setVisibility(View.GONE);
-//            mCurrentRecipeNo.setVisibility(View.GONE);
-//            mStepForth.setVisibility(View.GONE);
-//            mStepBack.setVisibility(View.GONE);
         }
-
-
-        initializeMediaSession();
-
-        // Examine the intent that was used to launch this activity,
-        // in order to figure out if we're creating a new item or editing an existing one.
-        Intent intent = getIntent();
-
-        currentStepNumber = intent.getStringExtra(EXTRA_STEP_NUMBER);
-        currentStepNumberInt = Integer.parseInt(intent.getStringExtra(EXTRA_STEP_NUMBER));
-
-        currentDetailedDescription = intent.getStringExtra(EXTRA_DESCRIPTION);
-        Log.i("detailed_step_descr", currentDetailedDescription);
-
-        currentVideoStep = intent.getStringExtra(EXTRA_VIDEOURL);
-        Log.i("detailed_step_link", currentVideoStep);
-
-        uriCurrentVideoStep = checkUrl(currentVideoStep);
-
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             mDetailedDescription.setText(currentDetailedDescription);
@@ -202,7 +159,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                 mStepBack.setVisibility(View.GONE);
             } else {
                 mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
-                        currentStepNumber));
+                        currentStepNumberInt));
             }
         }
         loadVideo(uriCurrentVideoStep);
@@ -225,9 +182,10 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                         mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                                 nextStep[1]));
                     }
-                    mDetailedDescription.setText(nextStep[3]);
-                    Uri tempUrl = checkUrl(nextStep[4]);
-                    loadVideo(tempUrl);
+                    currentDetailedDescription = nextStep[3];
+                    mDetailedDescription.setText(currentDetailedDescription);
+                    uriCurrentVideoStep = checkUrl(nextStep[4]);
+                    loadVideo(uriCurrentVideoStep);
                 }
             });
 
@@ -248,15 +206,14 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                         mCurrentRecipeNo.setText(String.format(Locale.ENGLISH, "%s: %s", mCurrentRecipeNoLabel,
                                 backStep[1]));
                     }
-                    mDetailedDescription.setText(backStep[3]);
-                    Uri tempUrl = checkUrl(backStep[4]);
-                    loadVideo(tempUrl);
+                    currentDetailedDescription = backStep[3];
+                    mDetailedDescription.setText(currentDetailedDescription);
+                    uriCurrentVideoStep = checkUrl(backStep[4]);
+                    loadVideo(uriCurrentVideoStep);
                 }
             });
         }
-
     }
-
 
     /**
      * Release ExoPlayer.
@@ -354,15 +311,9 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         releasePlayer();
         initializeMediaSession();
 
-
         if (uri == null) {
-//            Toast.makeText(getActivity(), getString(R.string.sample_not_found_error),
-//                    Toast.LENGTH_SHORT).show();
-//            mPlayerView.setDefaultArtwork(BitmapFactory.decodeResource
-//                    (getResources(), R.drawable.no_video));
             mPlayerView.setVisibility(View.GONE);
             mNoVideoAvailabe.setVisibility(View.VISIBLE);
-
 
         } else {
             mPlayerView.setVisibility(View.VISIBLE);
@@ -370,7 +321,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             // Initialize the player.
             initializePlayer(uri);
         }
-
     }
 
     /**
@@ -408,7 +358,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                     mExoPlayer.getCurrentPosition(), 1f);
         }
         mMediaSession.setPlaybackState(mStateBuilder.build());
-//        showNotification(mStateBuilder.build());
 
     }
 
@@ -510,4 +459,11 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     }
 
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("video", String.valueOf(uriCurrentVideoStep));
+        outState.putInt("number", currentStepNumberInt);
+        outState.putString("description", String.valueOf(currentDetailedDescription));
+    }
 }

@@ -30,7 +30,6 @@
         </activity>
         <activity
             android:name=".DetailedStepActivity"
-
             android:label="@string/title_activity_detailed_step"
             android:parentActivityName=".DetailActivity"
             android:theme="@style/AppTheme.NoActionBar">
