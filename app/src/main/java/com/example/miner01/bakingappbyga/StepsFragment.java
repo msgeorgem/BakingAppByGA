@@ -305,7 +305,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
     public void onDestroy() {
         super.onDestroy();
         releasePlayer();
-        mMediaSession.setActive(false);
+//        mMediaSession.setActive(false);
     }
 
     @Override

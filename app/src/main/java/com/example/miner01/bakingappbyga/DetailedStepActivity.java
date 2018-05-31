@@ -1,5 +1,6 @@
 package com.example.miner01.bakingappbyga;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.net.Uri;
@@ -62,6 +63,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     private int maxNumberOfSteps;
     private TextView mNoVideoAvailabe;
     private Uri uriCurrentVideoStep;
+    private Context context;
 
     /**
      * Release ExoPlayer.
@@ -76,26 +78,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         }
         mExoPlayer = null;
     }
-//    public static void buttonEffect(View button){
-//        button.setOnTouchListener(new View.OnTouchListener() {
-//
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN: {
-//                        v.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
-//                        v.invalidate();
-//                        break;
-//                    }
-//                    case MotionEvent.ACTION_UP: {
-//                        v.getBackground().clearColorFilter();
-//                        v.invalidate();
-//                        break;
-//                    }
-//                }
-//                return false;
-//            }
-//        });
-//    }
 
     /**
      * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
@@ -132,31 +114,26 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         mMediaSession.setActive(true);
 
     }
-
-    /**
-     * Initialize ExoPlayer.
-     *
-     * @param mediaUri The URI of the sample to play.
-     */
-    public static void initializePlayer(Uri mediaUri) {
-        if (mExoPlayer == null) {
-            // Create an instance of the ExoPlayer.
-            TrackSelector trackSelector = new DefaultTrackSelector();
-            LoadControl loadControl = new DefaultLoadControl();
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(DetailActivity.context, trackSelector, loadControl);
-            mPlayerView.setPlayer(mExoPlayer);
-
-            // Set the ExoPlayer.EventListener to this activity.
-            mExoPlayer.addListener((ExoPlayer.EventListener) DetailActivity.context);
-
-            // Prepare the MediaSource.
-            String userAgent = Util.getUserAgent(DetailActivity.context, "ClassicalMusicQuiz");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    DetailActivity.context, userAgent), new DefaultExtractorsFactory(), null, null);
-            mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
-        }
-    }
+//    public static void buttonEffect(View button){
+//        button.setOnTouchListener(new View.OnTouchListener() {
+//
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN: {
+//                        v.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
+//                        v.invalidate();
+//                        break;
+//                    }
+//                    case MotionEvent.ACTION_UP: {
+//                        v.getBackground().clearColorFilter();
+//                        v.invalidate();
+//                        break;
+//                    }
+//                }
+//                return false;
+//            }
+//        });
+//    }
 
     public static Uri checkUrl(String stringUrl) {
 
@@ -178,7 +155,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_step);
-        DetailActivity.context = getApplicationContext();
+        context = getApplicationContext();
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -326,7 +303,32 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         }
     }
 
-    public void loadVideo(Uri uri) {
+    /**
+     * Initialize ExoPlayer.
+     *
+     * @param mediaUri The URI of the sample to play.
+     */
+    public void initializePlayer(Uri mediaUri) {
+        if (mExoPlayer == null) {
+            // Create an instance of the ExoPlayer.
+            TrackSelector trackSelector = new DefaultTrackSelector();
+            LoadControl loadControl = new DefaultLoadControl();
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(context, trackSelector, loadControl);
+            mPlayerView.setPlayer(mExoPlayer);
+
+            // Set the ExoPlayer.EventListener to this activity.
+            mExoPlayer.addListener(this);
+
+            // Prepare the MediaSource.
+            String userAgent = Util.getUserAgent(context, "ClassicalMusicQuiz");
+            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
+                    context, userAgent), new DefaultExtractorsFactory(), null, null);
+            mExoPlayer.prepare(mediaSource);
+            mExoPlayer.setPlayWhenReady(true);
+        }
+    }
+
+    private void loadVideo(Uri uri) {
         releasePlayer();
         initializeMediaSession();
 
