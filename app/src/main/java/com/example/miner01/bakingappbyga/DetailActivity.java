@@ -2,6 +2,7 @@ package com.example.miner01.bakingappbyga;
 
 
 import android.app.FragmentManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.databinding.DataBindingUtil;
@@ -36,11 +37,14 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
     private Uri mCurrentItemUri;
     public static String mStep;
     private TextView mTitle;
+    public static Context context;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        context = getApplicationContext();
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
+
 
         if (MainActivity.is7InchTablet) {
 //            mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.just_click_step));

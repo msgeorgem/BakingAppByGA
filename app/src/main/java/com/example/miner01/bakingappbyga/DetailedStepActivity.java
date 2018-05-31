@@ -45,9 +45,9 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
 
     public static final String TAG = DetailedStepActivity.class.getSimpleName();
     private static MediaSessionCompat mMediaSession;
-    private SimpleExoPlayer mExoPlayer;
-    private SimpleExoPlayerView mPlayerView;
-    private PlaybackStateCompat.Builder mStateBuilder;
+    private static SimpleExoPlayer mExoPlayer;
+    private static SimpleExoPlayerView mPlayerView;
+    private static PlaybackStateCompat.Builder mStateBuilder;
     private ArrayList<String[]> currentRecipeDetailsWithStepNo1 = new ArrayList<>();
     private int currentStepNumberInt;
     private String currentDetailedDescription;
@@ -63,11 +63,122 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     private TextView mNoVideoAvailabe;
     private Uri uriCurrentVideoStep;
 
+    /**
+     * Release ExoPlayer.
+     */
+    public static void releasePlayer() {
+//        mNotificationManager.cancelAll();
+        if ((mExoPlayer != null)) {
+            mExoPlayer.stop();
+        }
+        if (mExoPlayer != null) {
+            mExoPlayer.release();
+        }
+        mExoPlayer = null;
+    }
+//    public static void buttonEffect(View button){
+//        button.setOnTouchListener(new View.OnTouchListener() {
+//
+//            public boolean onTouch(View v, MotionEvent event) {
+//                switch (event.getAction()) {
+//                    case MotionEvent.ACTION_DOWN: {
+//                        v.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
+//                        v.invalidate();
+//                        break;
+//                    }
+//                    case MotionEvent.ACTION_UP: {
+//                        v.getBackground().clearColorFilter();
+//                        v.invalidate();
+//                        break;
+//                    }
+//                }
+//                return false;
+//            }
+//        });
+//    }
+
+    /**
+     * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
+     * and media controller.
+     */
+    public static void initializeMediaSession() {
+
+        // Create a MediaSessionCompat.
+        mMediaSession = new MediaSessionCompat(DetailActivity.context, TAG);
+
+        // Enable callbacks from MediaButtons and TransportControls.
+        mMediaSession.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        // Do not let MediaButtons restart the player when the app is not visible.
+        mMediaSession.setMediaButtonReceiver(null);
+
+        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
+        mStateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
+
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+
+
+        // MySessionCallback has methods that handle callbacks from a media controller.
+        mMediaSession.setCallback(new DetailedStepActivity.MySessionCallback());
+
+        // Start the Media Session since the activity is active.
+        mMediaSession.setActive(true);
+
+    }
+
+    /**
+     * Initialize ExoPlayer.
+     *
+     * @param mediaUri The URI of the sample to play.
+     */
+    public static void initializePlayer(Uri mediaUri) {
+        if (mExoPlayer == null) {
+            // Create an instance of the ExoPlayer.
+            TrackSelector trackSelector = new DefaultTrackSelector();
+            LoadControl loadControl = new DefaultLoadControl();
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(DetailActivity.context, trackSelector, loadControl);
+            mPlayerView.setPlayer(mExoPlayer);
+
+            // Set the ExoPlayer.EventListener to this activity.
+            mExoPlayer.addListener((ExoPlayer.EventListener) DetailActivity.context);
+
+            // Prepare the MediaSource.
+            String userAgent = Util.getUserAgent(DetailActivity.context, "ClassicalMusicQuiz");
+            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
+                    DetailActivity.context, userAgent), new DefaultExtractorsFactory(), null, null);
+            mExoPlayer.prepare(mediaSource);
+            mExoPlayer.setPlayWhenReady(true);
+        }
+    }
+
+    public static Uri checkUrl(String stringUrl) {
+
+        URL url;
+        Uri uriCurrentVideoStep = null;
+        try {
+            url = new URL(stringUrl);
+            uriCurrentVideoStep = Uri.parse(url.toURI().toString());
+        } catch (MalformedURLException e1) {
+            e1.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return uriCurrentVideoStep;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detailed_step);
+        DetailActivity.context = getApplicationContext();
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
@@ -93,8 +204,8 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
 
         currentDetailedDescription = "";
         String currentVideoStep = "";
-
         initializeMediaSession();
+
 
         Intent intent = getIntent();
 
@@ -214,117 +325,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             });
         }
     }
-//    public static void buttonEffect(View button){
-//        button.setOnTouchListener(new View.OnTouchListener() {
-//
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN: {
-//                        v.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
-//                        v.invalidate();
-//                        break;
-//                    }
-//                    case MotionEvent.ACTION_UP: {
-//                        v.getBackground().clearColorFilter();
-//                        v.invalidate();
-//                        break;
-//                    }
-//                }
-//                return false;
-//            }
-//        });
-//    }
-
-    /**
-     * Release ExoPlayer.
-     */
-    public void releasePlayer() {
-//        mNotificationManager.cancelAll();
-        if ((mExoPlayer != null)) {
-            mExoPlayer.stop();
-        }
-        if (mExoPlayer != null) {
-            mExoPlayer.release();
-        }
-        mExoPlayer = null;
-    }
-
-    /**
-     * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
-     * and media controller.
-     */
-    public void initializeMediaSession() {
-
-        // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(this, TAG);
-
-        // Enable callbacks from MediaButtons and TransportControls.
-        mMediaSession.setFlags(
-                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-        // Do not let MediaButtons restart the player when the app is not visible.
-        mMediaSession.setMediaButtonReceiver(null);
-
-        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
-        mStateBuilder = new PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY |
-                                PlaybackStateCompat.ACTION_PAUSE |
-                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
-
-        mMediaSession.setPlaybackState(mStateBuilder.build());
-
-
-        // MySessionCallback has methods that handle callbacks from a media controller.
-        mMediaSession.setCallback(new DetailedStepActivity.MySessionCallback());
-
-        // Start the Media Session since the activity is active.
-        mMediaSession.setActive(true);
-
-    }
-
-    /**
-     * Initialize ExoPlayer.
-     *
-     * @param mediaUri The URI of the sample to play.
-     */
-    public void initializePlayer(Uri mediaUri) {
-        if (mExoPlayer == null) {
-            // Create an instance of the ExoPlayer.
-            TrackSelector trackSelector = new DefaultTrackSelector();
-            LoadControl loadControl = new DefaultLoadControl();
-            mExoPlayer = ExoPlayerFactory.newSimpleInstance(this, trackSelector, loadControl);
-            mPlayerView.setPlayer(mExoPlayer);
-
-            // Set the ExoPlayer.EventListener to this activity.
-            mExoPlayer.addListener(this);
-
-            // Prepare the MediaSource.
-            String userAgent = Util.getUserAgent(this, "ClassicalMusicQuiz");
-            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
-                    this, userAgent), new DefaultExtractorsFactory(), null, null);
-            mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
-        }
-    }
-
-    public Uri checkUrl(String stringUrl) {
-
-        URL url;
-        Uri uriCurrentVideoStep = null;
-        try {
-            url = new URL(stringUrl);
-            uriCurrentVideoStep = Uri.parse(url.toURI().toString());
-        } catch (MalformedURLException e1) {
-            e1.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        return uriCurrentVideoStep;
-    }
 
     public void loadVideo(Uri uri) {
         releasePlayer();
@@ -443,11 +443,10 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         void onFragmentInteraction(Uri uri);
     }
 
-
     /**
      * Media Session Callbacks, where all external clients control the player.
      */
-    private class MySessionCallback extends MediaSessionCompat.Callback {
+    private static class MySessionCallback extends MediaSessionCompat.Callback {
         @Override
         public void onPlay() {
             mExoPlayer.setPlayWhenReady(true);

@@ -3,10 +3,13 @@ package com.example.miner01.bakingappbyga;
 
 import android.app.Fragment;
 import android.app.FragmentTransaction;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -16,6 +19,23 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.miner01.bakingappbyga.databinding.FragmentStepsBinding;
+import com.google.android.exoplayer2.DefaultLoadControl;
+import com.google.android.exoplayer2.ExoPlaybackException;
+import com.google.android.exoplayer2.ExoPlayer;
+import com.google.android.exoplayer2.ExoPlayerFactory;
+import com.google.android.exoplayer2.LoadControl;
+import com.google.android.exoplayer2.SimpleExoPlayer;
+import com.google.android.exoplayer2.Timeline;
+import com.google.android.exoplayer2.extractor.DefaultExtractorsFactory;
+import com.google.android.exoplayer2.source.ExtractorMediaSource;
+import com.google.android.exoplayer2.source.MediaSource;
+import com.google.android.exoplayer2.source.TrackGroupArray;
+import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
+import com.google.android.exoplayer2.trackselection.TrackSelectionArray;
+import com.google.android.exoplayer2.trackselection.TrackSelector;
+import com.google.android.exoplayer2.ui.SimpleExoPlayerView;
+import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory;
+import com.google.android.exoplayer2.util.Util;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,12 +52,16 @@ import static com.example.miner01.bakingappbyga.DetailActivity.mDetailBinding;
  * create an instance of this fragment.
  */
 
-public class StepsFragment extends Fragment {
+public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
 
-
+    public static final String TAG = StepsFragment.class.getSimpleName();
     public static final String EXTRA_DESCRIPTION = "EXTRA_DESCRIPTION";
     public static final String EXTRA_VIDEOURL = "EXTRA_VIDEOURL";
     public static final String EXTRA_STEP_NUMBER = "EXTRA_STEP_NUMBER";
+    private SimpleExoPlayer mExoPlayer;
+    private MediaSessionCompat mMediaSession;
+    private SimpleExoPlayerView mPlayerView;
+    private PlaybackStateCompat.Builder mStateBuilder;
 
     private View view;
 
@@ -54,6 +78,7 @@ public class StepsFragment extends Fragment {
     public static final String LOG_TAG = StepsFragment.class.getSimpleName();
 
     private FragmentStepsBinding mFragmentStepsBinding;
+    private Uri uriCurrentVideoStep;
 
     public StepsFragment() {
         // Required empty public constructor
@@ -67,6 +92,7 @@ public class StepsFragment extends Fragment {
 //        view = inflater.inflate(R.layout.fragment_steps, container, false);
         mFragmentStepsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_steps, container, false);
         view = mFragmentStepsBinding.getRoot();
+        Context context = getActivity();
 
         currentRecipeIDInt = Integer.parseInt(DetailActivity.currentRecipeID);
 
@@ -76,6 +102,7 @@ public class StepsFragment extends Fragment {
         stepsRecyclerView = mFragmentStepsBinding.listSteps;
         currentRecipeDetailsWithStepNo = getCurrentRecipeDetailsWithStepNo();
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
 
         // Tablet code
         if (MainActivity.is7InchTablet) {
@@ -90,7 +117,23 @@ public class StepsFragment extends Fragment {
                     String videoUrl = item[4];
 
                     mDetailBinding.part3.detailedDescription.setText(detailedDescription);
+                    uriCurrentVideoStep = DetailedStepActivity.checkUrl(videoUrl);
 
+                    if (uriCurrentVideoStep == null) {
+                        mDetailBinding.part3.playerView.setVisibility(View.GONE);
+                        mDetailBinding.part3.playerViewFrame.setVisibility(View.GONE);
+                        mDetailBinding.part3.noVideoAvailable.setVisibility(View.VISIBLE);
+                        mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.no_video_available));
+
+                    } else {
+                        mDetailBinding.part3.noVideoAvailable.setVisibility(View.GONE);
+                        mDetailBinding.part3.playerView.setVisibility(View.VISIBLE);
+                        mDetailBinding.part3.playerViewFrame.setVisibility(View.VISIBLE);
+
+                        releasePlayer();
+                        initializeMediaSession();
+                        initializePlayer(uriCurrentVideoStep);
+                    }
                 }
             };
 
@@ -180,7 +223,147 @@ public class StepsFragment extends Fragment {
     }
 
 
+    /**
+     * Initialize ExoPlayer.
+     *
+     * @param mediaUri The URI of the sample to play.
+     */
+    public void initializePlayer(Uri mediaUri) {
+        if (mExoPlayer == null) {
+            // Create an instance of the ExoPlayer.
+            TrackSelector trackSelector = new DefaultTrackSelector();
+            LoadControl loadControl = new DefaultLoadControl();
+            mExoPlayer = ExoPlayerFactory.newSimpleInstance(getActivity(), trackSelector, loadControl);
+            mDetailBinding.part3.playerView.setPlayer(mExoPlayer);
 
+            // Set the ExoPlayer.EventListener to this activity.
+            mExoPlayer.addListener(this);
+
+            // Prepare the MediaSource.
+            String userAgent = Util.getUserAgent(getActivity(), "ClassicalMusicQuiz");
+            MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
+                    getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
+            mExoPlayer.prepare(mediaSource);
+            mExoPlayer.setPlayWhenReady(true);
+        }
+    }
+
+    /**
+     * Release ExoPlayer.
+     */
+    public void releasePlayer() {
+//        mNotificationManager.cancelAll();
+        if ((mExoPlayer != null)) {
+            mExoPlayer.stop();
+        }
+        if (mExoPlayer != null) {
+            mExoPlayer.release();
+        }
+        mExoPlayer = null;
+    }
+
+    /**
+     * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
+     * and media controller.
+     */
+    public void initializeMediaSession() {
+
+        // Create a MediaSessionCompat.
+        mMediaSession = new MediaSessionCompat(DetailActivity.context, TAG);
+
+        // Enable callbacks from MediaButtons and TransportControls.
+        mMediaSession.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        // Do not let MediaButtons restart the player when the app is not visible.
+        mMediaSession.setMediaButtonReceiver(null);
+
+        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
+        mStateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
+
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+
+
+        // MySessionCallback has methods that handle callbacks from a media controller.
+        mMediaSession.setCallback(new MySessionCallback());
+
+        // Start the Media Session since the activity is active.
+        mMediaSession.setActive(true);
+
+    }
+
+    /**
+     * Release the player when the activity is destroyed.
+     */
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        releasePlayer();
+        mMediaSession.setActive(false);
+    }
+
+    @Override
+    public void onTimelineChanged(Timeline timeline, Object manifest) {
+
+    }
+
+    @Override
+    public void onTracksChanged(TrackGroupArray trackGroups, TrackSelectionArray trackSelections) {
+
+    }
+
+    @Override
+    public void onLoadingChanged(boolean isLoading) {
+
+    }
+
+    @Override
+    public void onPlayerStateChanged(boolean playWhenReady, int playbackState) {
+        if ((playbackState == ExoPlayer.STATE_READY) && playWhenReady) {
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PLAYING,
+                    mExoPlayer.getCurrentPosition(), 1f);
+        } else if ((playbackState == ExoPlayer.STATE_READY)) {
+            mStateBuilder.setState(PlaybackStateCompat.STATE_PAUSED,
+                    mExoPlayer.getCurrentPosition(), 1f);
+        }
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+    }
+
+    @Override
+    public void onPlayerError(ExoPlaybackException error) {
+
+    }
+
+    @Override
+    public void onPositionDiscontinuity() {
+
+    }
+
+    /**
+     * Media Session Callbacks, where all external clients control the player.
+     */
+    private class MySessionCallback extends MediaSessionCompat.Callback {
+        @Override
+        public void onPlay() {
+            mExoPlayer.setPlayWhenReady(true);
+        }
+
+        @Override
+        public void onPause() {
+            mExoPlayer.setPlayWhenReady(false);
+        }
+
+        @Override
+        public void onSkipToPrevious() {
+            mExoPlayer.seekTo(0);
+        }
+    }
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
