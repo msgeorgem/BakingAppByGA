@@ -62,6 +62,7 @@ public class RecipeMainAdapter extends RecyclerView.Adapter<RecipeMainAdapter.Ma
                 @Override
                 public void onClick(View v) {
                     listener.onItemClick(item);
+
                 }
             });
         }

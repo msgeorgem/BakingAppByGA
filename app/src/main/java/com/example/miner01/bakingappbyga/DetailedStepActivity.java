@@ -65,91 +65,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     private Uri uriCurrentVideoStep;
     private Context context;
 
-    /**
-     * Release ExoPlayer.
-     */
-    public static void releasePlayer() {
-//        mNotificationManager.cancelAll();
-        if ((mExoPlayer != null)) {
-            mExoPlayer.stop();
-        }
-        if (mExoPlayer != null) {
-            mExoPlayer.release();
-        }
-        mExoPlayer = null;
-    }
 
-    /**
-     * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
-     * and media controller.
-     */
-    public static void initializeMediaSession() {
-
-        // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(DetailActivity.context, TAG);
-
-        // Enable callbacks from MediaButtons and TransportControls.
-        mMediaSession.setFlags(
-                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
-                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
-        // Do not let MediaButtons restart the player when the app is not visible.
-        mMediaSession.setMediaButtonReceiver(null);
-
-        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
-        mStateBuilder = new PlaybackStateCompat.Builder()
-                .setActions(
-                        PlaybackStateCompat.ACTION_PLAY |
-                                PlaybackStateCompat.ACTION_PAUSE |
-                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
-
-        mMediaSession.setPlaybackState(mStateBuilder.build());
-
-
-        // MySessionCallback has methods that handle callbacks from a media controller.
-        mMediaSession.setCallback(new DetailedStepActivity.MySessionCallback());
-
-        // Start the Media Session since the activity is active.
-        mMediaSession.setActive(true);
-
-    }
-//    public static void buttonEffect(View button){
-//        button.setOnTouchListener(new View.OnTouchListener() {
-//
-//            public boolean onTouch(View v, MotionEvent event) {
-//                switch (event.getAction()) {
-//                    case MotionEvent.ACTION_DOWN: {
-//                        v.getBackground().setColorFilter(0xe0f47521, PorterDuff.Mode.SRC_ATOP);
-//                        v.invalidate();
-//                        break;
-//                    }
-//                    case MotionEvent.ACTION_UP: {
-//                        v.getBackground().clearColorFilter();
-//                        v.invalidate();
-//                        break;
-//                    }
-//                }
-//                return false;
-//            }
-//        });
-//    }
-
-    public static Uri checkUrl(String stringUrl) {
-
-        URL url;
-        Uri uriCurrentVideoStep = null;
-        try {
-            url = new URL(stringUrl);
-            uriCurrentVideoStep = Uri.parse(url.toURI().toString());
-        } catch (MalformedURLException e1) {
-            e1.printStackTrace();
-        } catch (URISyntaxException e) {
-            e.printStackTrace();
-        }
-
-        return uriCurrentVideoStep;
-    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -169,7 +85,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         mPlayerView = findViewById(R.id.playerView);
         mPlayerViewFrame = findViewById(R.id.playerViewFrame);
         mNoVideoAvailabe = findViewById(R.id.noVideoAvailable);
-//        mNoVideoAvailabe.setVisibility(View.GONE);
 
         mDetailedDescription = findViewById(R.id.detailed_description);
         mCurrentRecipeNoLabel = getResources().getString(R.string.current_step);
@@ -182,7 +97,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         currentDetailedDescription = "";
         String currentVideoStep = "";
         initializeMediaSession();
-
 
         Intent intent = getIntent();
 
@@ -276,7 +190,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             mStepBack.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-//                    buttonEffect(mStepBack);
                     int backStepNo = getPrevStepNo(currentStepNumberInt);
 
                     String[] backStep = getNextPrevStep(backStepNo);
@@ -303,6 +216,118 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         }
     }
 
+    /**
+     * Release ExoPlayer.
+     */
+    public static void releasePlayer() {
+//        mNotificationManager.cancelAll();
+        if ((mExoPlayer != null)) {
+            mExoPlayer.stop();
+        }
+        if (mExoPlayer != null) {
+            mExoPlayer.release();
+        }
+        mExoPlayer = null;
+    }
+
+    /**
+     * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
+     * and media controller.
+     */
+    public static void initializeMediaSession() {
+
+        // Create a MediaSessionCompat.
+        mMediaSession = new MediaSessionCompat(DetailActivity.context, TAG);
+
+        // Enable callbacks from MediaButtons and TransportControls.
+        mMediaSession.setFlags(
+                MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS |
+                        MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        // Do not let MediaButtons restart the player when the app is not visible.
+        mMediaSession.setMediaButtonReceiver(null);
+
+        // Set an initial PlaybackState with ACTION_PLAY, so media buttons can start the player.
+        mStateBuilder = new PlaybackStateCompat.Builder()
+                .setActions(
+                        PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE);
+
+        mMediaSession.setPlaybackState(mStateBuilder.build());
+
+
+        // MySessionCallback has methods that handle callbacks from a media controller.
+        mMediaSession.setCallback(new DetailedStepActivity.MySessionCallback());
+
+        // Start the Media Session since the activity is active.
+        mMediaSession.setActive(true);
+    }
+
+    public static Uri checkUrl(String stringUrl) {
+
+        URL url;
+        Uri uriCurrentVideoStep = null;
+        try {
+            url = new URL(stringUrl);
+            uriCurrentVideoStep = Uri.parse(url.toURI().toString());
+        } catch (MalformedURLException e1) {
+            e1.printStackTrace();
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+        }
+
+        return uriCurrentVideoStep;
+    }
+
+    private int getNextStepNo(int currentStepNo) {
+
+        if (currentStepNo == (maxNumberOfSteps - 1)) {
+            currentStepNumberInt = currentStepNo;
+            mStepForth.setVisibility(View.GONE);
+
+        } else {
+            currentStepNumberInt = currentStepNo + 1;
+            mStepForth.setVisibility(View.VISIBLE);
+            mStepBack.setVisibility(View.VISIBLE);
+        }
+
+        return currentStepNumberInt;
+    }
+
+    private int getPrevStepNo(int currentStepNo) {
+
+        if (currentStepNo == 0) {
+            currentStepNumberInt = currentStepNo;
+            mStepBack.setVisibility(View.GONE);
+
+        } else {
+            currentStepNumberInt = currentStepNo - 1;
+            mStepBack.setVisibility(View.VISIBLE);
+            mStepForth.setVisibility(View.VISIBLE);
+        }
+        return currentStepNumberInt;
+    }
+
+    private String[] getNextPrevStep(int prevNextStepNo) {
+        String[] prevNextStep = new String[5];
+
+        ArrayList<String[]> tempCurrentSteps = currentRecipeDetailsWithStepNo1;
+        for (int i = 0; i < tempCurrentSteps.size(); i++) {
+            String[] elements = tempCurrentSteps.get(i);
+            int stepNo = Integer.parseInt(elements[1]);
+
+            if (stepNo == prevNextStepNo) {
+                prevNextStep[0] = elements[0];
+                prevNextStep[1] = elements[1];
+                prevNextStep[2] = elements[2];
+                prevNextStep[3] = elements[3];
+                prevNextStep[4] = elements[4];
+            }
+        }
+        return prevNextStep;
+    }
     /**
      * Initialize ExoPlayer.
      *
@@ -392,53 +417,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
 
     }
 
-    private int getNextStepNo(int currentStepNo) {
-
-        if (currentStepNo == (maxNumberOfSteps - 1)) {
-            currentStepNumberInt = currentStepNo;
-            mStepForth.setVisibility(View.GONE);
-
-        } else {
-            currentStepNumberInt = currentStepNo + 1;
-            mStepForth.setVisibility(View.VISIBLE);
-            mStepBack.setVisibility(View.VISIBLE);
-        }
-
-        return currentStepNumberInt;
-    }
-
-    private int getPrevStepNo(int currentStepNo) {
-
-        if (currentStepNo == 0) {
-            currentStepNumberInt = currentStepNo;
-            mStepBack.setVisibility(View.GONE);
-
-        } else {
-            currentStepNumberInt = currentStepNo - 1;
-            mStepBack.setVisibility(View.VISIBLE);
-            mStepForth.setVisibility(View.VISIBLE);
-        }
-        return currentStepNumberInt;
-    }
-
-    private String[] getNextPrevStep(int prevNextStepNo) {
-        String[] prevNextStep = new String[5];
-
-        ArrayList<String[]> tempCurrentSteps = currentRecipeDetailsWithStepNo1;
-        for (int i = 0; i < tempCurrentSteps.size(); i++) {
-            String[] elements = tempCurrentSteps.get(i);
-            int stepNo = Integer.parseInt(elements[1]);
-
-            if (stepNo == prevNextStepNo) {
-                prevNextStep[0] = elements[0];
-                prevNextStep[1] = elements[1];
-                prevNextStep[2] = elements[2];
-                prevNextStep[3] = elements[3];
-                prevNextStep[4] = elements[4];
-            }
-        }
-        return prevNextStep;
-    }
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name

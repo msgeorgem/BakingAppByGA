@@ -46,7 +46,7 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
 
-        if (MainActivity.is7InchTablet) {
+        if (MainActivity.isSizeXLarge) {
 //            mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.just_click_step));
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {

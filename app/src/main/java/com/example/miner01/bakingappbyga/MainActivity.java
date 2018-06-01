@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Recipes> recipesList = new ArrayList<>();
     private RecyclerView recipesRecyclerView;
     public static int sizeXLarge;
-    public static boolean is7InchTablet;
+    public static boolean isSizeXLarge;
     /**
      * Adapter for the list of recipes
      */
@@ -46,12 +46,12 @@ public class MainActivity extends AppCompatActivity {
         recipesRecyclerView = findViewById(R.id.list_item);
         recipesList = JsonUtils.parseRecipesJson(JsonString.strJson);
 
-        sizeXLarge = SCREENLAYOUT_SIZE_XLARGE; // For 10" tablet
-        is7InchTablet = context.getResources().getConfiguration()
+        sizeXLarge = SCREENLAYOUT_SIZE_XLARGE; // For sizeXLarge Tablets
+        isSizeXLarge = context.getResources().getConfiguration()
                 .isLayoutSizeAtLeast(sizeXLarge);
 
 
-        if (is7InchTablet) {
+        if (isSizeXLarge) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 recipesRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
@@ -90,7 +90,5 @@ public class MainActivity extends AppCompatActivity {
         recipesRecyclerView.setAdapter(mAdapter);
         recipesRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
-
     }
-
 }

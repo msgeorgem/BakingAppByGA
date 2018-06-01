@@ -105,7 +105,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
 
 
         // Tablet code
-        if (MainActivity.is7InchTablet) {
+        if (MainActivity.isSizeXLarge) {
             mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.just_click_step));
             mListener = new RecipeDetailAdapter.OnItemClickListener() {
 

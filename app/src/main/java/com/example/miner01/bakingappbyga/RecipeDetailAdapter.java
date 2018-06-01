@@ -9,6 +9,8 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import static android.graphics.Color.rgb;
+
 public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapter.MainViewHolder> {
 
 
@@ -67,6 +69,14 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
                 @Override
                 public void onClick(View v) {
                     listener.onItemClick(item);
+                    if (v != null) {
+//                        v.setBackgroundColor(rgb(255,64,129)); // colorAccent
+                        v.setBackgroundColor(rgb(63, 81, 181)); //colorPrimary
+//                        v.getResources().getColor(R.color.colorPrimary);
+                        detailStepTextView.setTextColor(rgb(255, 255, 255));
+                    } else {
+                        v.setBackgroundColor(rgb(255, 255, 255));
+                    }
                 }
             });
         }
