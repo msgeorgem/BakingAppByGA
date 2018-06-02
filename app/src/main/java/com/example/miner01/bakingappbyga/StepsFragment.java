@@ -2,7 +2,6 @@ package com.example.miner01.bakingappbyga;
 
 
 import android.app.Fragment;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
@@ -73,8 +72,8 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
     public static ArrayList<String[]> currentRecipeDetailsWithStepNo = new ArrayList<>();
 
     private static RecyclerView stepsRecyclerView;
-    private RecipeDetailAdapter.OnItemClickListener mListener;
-    private RecipeDetailAdapter mAdapter = new RecipeDetailAdapter(currentRecipeDetailsWithStepNo, mListener);
+    private static RecipeDetailAdapter.OnItemClickListener mListener;
+    public static RecipeDetailAdapter mAdapter = new RecipeDetailAdapter(currentRecipeDetailsWithStepNo, mListener);
     public static final String LOG_TAG = StepsFragment.class.getSimpleName();
 
     private FragmentStepsBinding mFragmentStepsBinding;
@@ -118,8 +117,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
                     String detailedDescription = item[3];
                     String videoUrl = item[4];
 
-                    RecipeDetailAdapter.selectedIndex = stepNumber;
-                    RecipeDetailAdapter.setSelectedIndex(RecipeDetailAdapter.selectedIndex);
+                    RecipeDetailAdapter.setSelectedIndex(stepNumber);
                     mAdapter.notifyDataSetChanged();
 
                     mDetailBinding.part3.detailedDescription.setText(detailedDescription);
@@ -130,6 +128,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
                         mDetailBinding.part3.playerViewFrame.setVisibility(View.GONE);
                         mDetailBinding.part3.noVideoAvailable.setVisibility(View.VISIBLE);
                         mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.no_video_available));
+                        releasePlayer();
 
                     } else {
                         mDetailBinding.part3.noVideoAvailable.setVisibility(View.GONE);
@@ -154,7 +153,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
                     String detailedDescription = item[3];
                     String videoUrl = item[4];
 
-
                     Intent intent1 = null;
                     if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
                         intent1 = new Intent(getContext(), DetailedStepActivity.class);
@@ -178,14 +176,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
 
         return view;
     }
-
-    public void replaceFragment(Fragment fragment) {
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
-        transaction.replace(mDetailBinding.part3.detailedStepContainer.getId(), fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
 
     private ArrayList<String[]> getCurrentRecipeDetails(int currentRecipeIDInt) {
         ArrayList<String[]> currentRecipeDetails = new ArrayList<>();

@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import static com.example.miner01.bakingappbyga.MainActivity.isSizeXLarge;
+
 
 public class DetailActivity extends AppCompatActivity implements StepsFragment.OnFragmentInteractionListener {
 
@@ -47,8 +49,7 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
 
-        if (MainActivity.isSizeXLarge) {
-//            mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.just_click_step));
+        if (isSizeXLarge) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
@@ -70,7 +71,6 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         currentRecipeID = intent.getStringExtra(MainActivity.EXTRA_ID);
         mTitle = findViewById(R.id.recipe_title);
         mTitle.setText(intent.getStringExtra(MainActivity.EXTRA_NAME));
-//        currentRecipeIDInt = Integer.parseInt(currentRecipeID);
 
         Log.i("detail activity", currentRecipeID);
 
@@ -104,7 +104,6 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         mDetailBinding.part1.ingredients.setText(builder2.toString());
         mDetailBinding.part1.ingredients.setVisibility(View.VISIBLE);
         mDetailBinding.part2.stepsContainer.setVisibility(View.VISIBLE);
-//            mDetailBinding.part5.detailNavigationTemp.setVisibility(View.GONE);
 
         mStepsFragment = new StepsFragment();
         FragmentManager managerA = getFragmentManager();
@@ -117,6 +116,18 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
     @Override
     public void onFragmentInteraction(Uri uri) {
 
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        if (isSizeXLarge) {
+
+            int slectedIndex = -9;
+            RecipeDetailAdapter.setSelectedIndex(-9);
+            StepsFragment.mAdapter.notifyDataSetChanged();
+            Log.i("OnBackPressed", String.valueOf(slectedIndex));
+        }
     }
 
     private void closeOnError() {
