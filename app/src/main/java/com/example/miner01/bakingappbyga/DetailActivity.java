@@ -39,6 +39,7 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
     private TextView mTitle;
     public static Context context;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

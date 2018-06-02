@@ -29,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recipesRecyclerView;
     public static int sizeXLarge;
     public static boolean isSizeXLarge;
+
     /**
      * Adapter for the list of recipes
      */
@@ -41,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
+        RecipeDetailAdapter.selectedIndex = -9;
 
         // Find a reference to the {@link ListView} in the layout
         recipesRecyclerView = findViewById(R.id.list_item);

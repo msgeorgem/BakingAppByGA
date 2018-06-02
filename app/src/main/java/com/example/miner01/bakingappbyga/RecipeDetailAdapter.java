@@ -16,11 +16,17 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
 
     private final OnItemClickListener listener;
     private ArrayList<String[]> mListStepsAdapter;
+    public static int selectedIndex = -9;
 
 
     public RecipeDetailAdapter(ArrayList<String[]> listSteps, OnItemClickListener listener) {
         mListStepsAdapter = listSteps;
         this.listener = listener;
+
+    }
+
+    public static void setSelectedIndex(int ind) {
+        selectedIndex = ind;
     }
 
     @Override
@@ -45,15 +51,27 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
         viewHolder.stepNo.setText(String.format(Locale.ENGLISH, "%s: %s", DetailActivity.mStep,
                 currentStep[1]));
         viewHolder.detailStepTextView.setText(currentStep[2]);
+
+        if (position == selectedIndex) {
+            viewHolder.wholeView.setBackgroundColor(rgb(63, 81, 181));
+            viewHolder.stepNo.setTextColor(rgb(255, 255, 255));
+            viewHolder.detailStepTextView.setTextColor(rgb(255, 255, 255));
+        } else {
+            viewHolder.wholeView.setBackgroundColor(rgb(255, 255, 255));
+            viewHolder.stepNo.setTextColor(rgb(128, 128, 128));
+            viewHolder.detailStepTextView.setTextColor(rgb(128, 128, 128));
+        }
+
     }
 
     public interface OnItemClickListener {
         void onItemClick(String[] item);
     }
 
-    public static class MainViewHolder extends RecyclerView.ViewHolder {
+    public class MainViewHolder extends RecyclerView.ViewHolder {
         TextView stepNo;
         TextView detailStepTextView;
+        View wholeView;
 
 
         private MainViewHolder(View view) {
@@ -61,6 +79,8 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
             this.stepNo = view.findViewById(R.id.step_no);
             this.detailStepTextView = view
                     .findViewById(R.id.detail_step);
+            this.wholeView = view.findViewById(R.id.step_layout);
+
         }
 
         public void bind(final String[] item, final OnItemClickListener listener) {
@@ -69,14 +89,6 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
                 @Override
                 public void onClick(View v) {
                     listener.onItemClick(item);
-                    if (v != null) {
-//                        v.setBackgroundColor(rgb(255,64,129)); // colorAccent
-                        v.setBackgroundColor(rgb(63, 81, 181)); //colorPrimary
-//                        v.getResources().getColor(R.color.colorPrimary);
-                        detailStepTextView.setTextColor(rgb(255, 255, 255));
-                    } else {
-                        v.setBackgroundColor(rgb(255, 255, 255));
-                    }
                 }
             });
         }

@@ -79,6 +79,8 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
 
     private FragmentStepsBinding mFragmentStepsBinding;
     private Uri uriCurrentVideoStep;
+    private int stepNumber;
+
 
     public StepsFragment() {
         // Required empty public constructor
@@ -112,9 +114,13 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
                 @Override
                 public void onItemClick(String[] item) {
 
-                    String stepNumber = item[1];
+                    stepNumber = Integer.parseInt(item[1]);
                     String detailedDescription = item[3];
                     String videoUrl = item[4];
+
+                    RecipeDetailAdapter.selectedIndex = stepNumber;
+                    RecipeDetailAdapter.setSelectedIndex(RecipeDetailAdapter.selectedIndex);
+                    mAdapter.notifyDataSetChanged();
 
                     mDetailBinding.part3.detailedDescription.setText(detailedDescription);
                     uriCurrentVideoStep = DetailedStepActivity.checkUrl(videoUrl);
@@ -144,7 +150,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
                 @Override
                 public void onItemClick(String[] item) {
 
-                    String stepNumber = item[1];
+                    stepNumber = Integer.parseInt(item[1]);
                     String detailedDescription = item[3];
                     String videoUrl = item[4];
 
@@ -162,7 +168,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
                 }
             };
         }
-
 
         mAdapter = new RecipeDetailAdapter(currentRecipeDetailsWithStepNo, mListener);
 
