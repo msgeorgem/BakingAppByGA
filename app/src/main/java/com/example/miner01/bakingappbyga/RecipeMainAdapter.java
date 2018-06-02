@@ -14,7 +14,6 @@ public class RecipeMainAdapter extends RecyclerView.Adapter<RecipeMainAdapter.Ma
     private final OnItemClickListener listener;
     private ArrayList<Recipes> mListAdapter;
 
-
     public RecipeMainAdapter(ArrayList<Recipes> listRecipes, OnItemClickListener listener) {
         mListAdapter = listRecipes;
         this.listener = listener;

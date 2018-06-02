@@ -42,7 +42,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         context = getApplicationContext();
-        RecipeDetailAdapter.selectedIndex = -9;
 
         // Find a reference to the {@link ListView} in the layout
         recipesRecyclerView = findViewById(R.id.list_item);
@@ -54,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         if (isSizeXLarge) {
+
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 recipesRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));

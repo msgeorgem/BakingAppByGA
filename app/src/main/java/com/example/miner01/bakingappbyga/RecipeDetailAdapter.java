@@ -1,6 +1,7 @@
 package com.example.miner01.bakingappbyga;
 
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,11 +14,9 @@ import static android.graphics.Color.rgb;
 
 public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapter.MainViewHolder> {
 
-
     private final OnItemClickListener listener;
     private ArrayList<String[]> mListStepsAdapter;
     public static int selectedIndex = -9;
-
 
     public RecipeDetailAdapter(ArrayList<String[]> listSteps, OnItemClickListener listener) {
         mListStepsAdapter = listSteps;
@@ -50,7 +49,7 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
         viewHolder.stepNo.setText(String.format(Locale.ENGLISH, "%s: %s", DetailActivity.mStep,
                 currentStep[1]));
         viewHolder.detailStepTextView.setText(currentStep[2]);
-
+        Log.i("selectedIndex", String.valueOf(selectedIndex));
         if (position == selectedIndex) {
             viewHolder.wholeView.setBackgroundColor(rgb(63, 81, 181));
             viewHolder.stepNo.setTextColor(rgb(255, 255, 255));
@@ -62,11 +61,6 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
         }
     }
 
-//    public void clear() {
-//        mListStepsAdapter.clear();
-//        notifyDataSetChanged();
-//    }
-
     public interface OnItemClickListener {
         void onItemClick(String[] item);
     }
@@ -75,7 +69,6 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
         TextView stepNo;
         TextView detailStepTextView;
         View wholeView;
-
 
         private MainViewHolder(View view) {
             super(view);

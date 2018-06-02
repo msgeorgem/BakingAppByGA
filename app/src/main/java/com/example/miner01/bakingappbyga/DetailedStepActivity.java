@@ -96,6 +96,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
 
         currentDetailedDescription = "";
         String currentVideoStep = "";
+        releasePlayer();
         initializeMediaSession();
 
         Intent intent = getIntent();
@@ -106,7 +107,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             uriCurrentVideoStep = checkUrl(currentVideoStep);
             currentDetailedDescription = intent.getStringExtra(EXTRA_DESCRIPTION);
             Log.i("detailed_step_descr", currentDetailedDescription);
-            currentStepNumberInt = Integer.parseInt(intent.getStringExtra(EXTRA_STEP_NUMBER));
+            currentStepNumberInt = intent.getIntExtra(EXTRA_STEP_NUMBER, 0);
         } else {
             uriCurrentVideoStep = checkUrl(savedInstanceState.getString("video"));
             currentStepNumberInt = savedInstanceState.getInt("number");
@@ -416,7 +417,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     public void onPositionDiscontinuity() {
 
     }
-
 
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
