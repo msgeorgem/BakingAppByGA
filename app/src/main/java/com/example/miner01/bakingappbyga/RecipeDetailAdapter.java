@@ -22,7 +22,6 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
     public RecipeDetailAdapter(ArrayList<String[]> listSteps, OnItemClickListener listener) {
         mListStepsAdapter = listSteps;
         this.listener = listener;
-
     }
 
     public static void setSelectedIndex(int ind) {
@@ -61,8 +60,12 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
             viewHolder.stepNo.setTextColor(rgb(128, 128, 128));
             viewHolder.detailStepTextView.setTextColor(rgb(128, 128, 128));
         }
-
     }
+
+//    public void clear() {
+//        mListStepsAdapter.clear();
+//        notifyDataSetChanged();
+//    }
 
     public interface OnItemClickListener {
         void onItemClick(String[] item);
