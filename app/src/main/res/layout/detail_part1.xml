@@ -10,18 +10,10 @@
 
         <TextView
             android:id="@+id/recipe_title"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:background="@color/colorPrimary"
-            android:fontFamily="cursive"
-            android:gravity="start|center_vertical"
-            android:paddingTop="@dimen/layout_margin_04"
             android:text="@string/ingredients"
-            android:textAlignment="center"
-            android:textColor="#FFFFFF"
-            android:textSize="@dimen/font_size3"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
+            style="@style/Title"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
@@ -51,15 +43,7 @@
 
             <TextView
                 android:id="@+id/ingredients"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
-                android:gravity="start|center_vertical"
-                android:paddingLeft="@dimen/layout_margin_16"
-                android:paddingRight="@dimen/layout_margin_16"
-                android:paddingTop="@dimen/layout_margin_04"
-                android:textColor="#FFFFFF"
-                android:textSize="@dimen/font_size0" />
+                style="@style/Ingredients" />
         </ScrollView>
 
     </android.support.constraint.ConstraintLayout>

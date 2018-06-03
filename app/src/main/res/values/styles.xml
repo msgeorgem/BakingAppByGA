@@ -24,4 +24,28 @@
         <item name="android:windowContentOverlay">@null</item>
     </style>
 
+    <style name="Title">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:fontFamily">cursive</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:paddingTop">@dimen/layout_margin_04</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">@dimen/font_size3</item>
+    </style>
+
+    <style name="Ingredients">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:background">@color/colorPrimary</item>
+        <item name="android:gravity">start|center_vertical</item>
+        <item name="android:paddingLeft">@dimen/layout_margin_16</item>
+        <item name="android:paddingRight">@dimen/layout_margin_16</item>
+        <item name="android:paddingTop">@dimen/layout_margin_04</item>
+        <item name="android:textColor">#FFFFFF</item>
+        <item name="android:textSize">@dimen/font_size0</item>
+    </style>
+
 </resources>

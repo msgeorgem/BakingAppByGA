@@ -26,7 +26,7 @@ import android.widget.RemoteViewsService;
 import android.widget.TextView;
 
 import com.example.miner01.bakingappbyga.Utils.JsonString;
-import com.example.miner01.bakingappbyga.Utils.JsonUtils1;
+import com.example.miner01.bakingappbyga.Utils.JsonUtils;
 import com.example.miner01.bakingappbyga.databinding.ActivityDetailBinding;
 
 import java.util.ArrayList;
@@ -45,16 +45,21 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     public static ActivityDetailBinding mDetailBinding;
     public static Recipes recipes;
-    public static int currentRecipeID;
+    public static String currentRecipeID;
     Context mContext;
     Cursor mCursor;
+    private int mAppWidgetId;
     private List<String[]> recipesIngredients;
     private List<String[]> currentRecipeIngredients = new ArrayList<>();
+    private ArrayList<Recipes> recipesList = new ArrayList<>();
+    private ArrayList<String[]> ingredientsList = new ArrayList<>();
     private TextView mTitle;
 
 
     public ListRemoteViewsFactory(Context applicationContext) {
         mContext = applicationContext;
+//        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
+//                AppWidgetManager.INVALID_APPWIDGET_ID);
 
     }
 
@@ -66,27 +71,19 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     //called on start and when notifyAppWidgetViewDataChanged is called
     @Override
     public void onDataSetChanged() {
-        // Get all plant info ordered by creation time
-//        Uri PLANT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_PLANTS).build();
-//        if (mCursor != null) mCursor.close();
-//        mCursor = mContext.getContentResolver().query(
-//                PLANT_URI,
-//                null,
-//                null,
-//                null,
-//                PlantContract.PlantEntry.COLUMN_CREATION_TIME
-//        );
+        // Get all recipes info ordered by creation time
+        recipesList = JsonUtils.parseRecipesJson(JsonString.strJson);
+
     }
 
     @Override
     public void onDestroy() {
-        mCursor.close();
+        recipesList.clear();
     }
 
     @Override
     public int getCount() {
-        if (mCursor == null) return 0;
-        return mCursor.getCount();
+        return recipesList.size();
     }
 
     /**
@@ -97,21 +94,48 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
      */
     @Override
     public RemoteViews getViewAt(int position) {
-        recipes = JsonUtils1.parseRecipesJson(JsonString.strJson);
+        recipes = recipesList.get(position);
+        currentRecipeID = recipes.getID();
+        Log.i("widget", currentRecipeID);
 
-        currentRecipeID = position;
-//        mTitle = findViewById(R.id.recipe_title);
-//        mTitle.setText(intent.getStringExtra(MainActivity.EXTRA_NAME));
+        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.ingredient_widget);
 
-        Log.i("widgety", String.valueOf(currentRecipeID));
+        // Update the plant image
+//        int imgRes = PlantUtils.getPlantImageRes(mContext, timeNow - createdAt, timeNow - wateredAt, plantType);
+//        views.setImageViewResource(R.id.widget_plant_image, imgRes);
+        views.setTextViewText(R.id.widget_recipe_title, recipes.getName());
+        views.setTextViewText(R.id.widget_ingredients, getRecipeIngredients(currentRecipeID, recipes));
+//        views.setTextViewText(R.id.widget_ingredients, recipes.getID());
+        // Always hide the water drop in GridView mode
+//        views.setViewVisibility(R.id.widget_water_button, View.GONE);
+
+        // Fill in the onClick PendingIntent Template using the specific plant Id for each item individually
+        Bundle extras = new Bundle();
+        extras.putString(MainActivity.EXTRA_ID, recipes.getID());
+        Intent fillInIntent = new Intent();
+        fillInIntent.putExtras(extras);
+        views.setOnClickFillInIntent(R.id.widget_recipe_title, fillInIntent);
+
+//        Bundle extras = new Bundle();
+//        extras.putLong(MainActivity.EXTRA_ID, currentRecipeID);
+//        Intent fillInIntent = new Intent();
+//        fillInIntent.putExtras(extras);
+//        views.setOnClickFillInIntent(R.id.piece_of_ingredient, fillInIntent);
+
+        return views;
+
+    }
+
+    private String getRecipeIngredients(String currentRecipeID, Recipes recipes) {
+        String pieceOfIngredient = "";
 
         recipesIngredients = recipes.getIngredients();
 
         for (int i = 0; i < recipesIngredients.size(); i++) {
             String[] elements = recipesIngredients.get(i);
-            int firstElementRecipe = Integer.parseInt(elements[0]);
-
-            if (firstElementRecipe == currentRecipeID) {
+            String firstElementRecipe = elements[0];
+            Log.i("widget get", currentRecipeID);
+            if (firstElementRecipe.equals(currentRecipeID)) {
                 String[] ingredientArr = new String[3];
                 ingredientArr[0] = elements[1];
                 ingredientArr[1] = elements[2];
@@ -128,31 +152,13 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                     .replace("[", "")  //remove the right bracket
                     .replace("]", "")  //remove the left bracket
                     .trim();
-            Log.i("current_detail", formattedString);
+            Log.i("widget get ingredient", formattedString);
             builder2.append("* ").append(formattedString).append("\n");
         }
 
 
-        String pieceOfIngredient = String.valueOf(builder2);
-
-        RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.ingredient_widget);
-
-        // Update the plant image
-//        int imgRes = PlantUtils.getPlantImageRes(mContext, timeNow - createdAt, timeNow - wateredAt, plantType);
-//        views.setImageViewResource(R.id.widget_plant_image, imgRes);
-        views.setTextViewText(R.id.piece_of_ingredient, pieceOfIngredient);
-        // Always hide the water drop in GridView mode
-//        views.setViewVisibility(R.id.widget_water_button, View.GONE);
-
-        // Fill in the onClick PendingIntent Template using the specific plant Id for each item individually
-        Bundle extras = new Bundle();
-        extras.putLong(MainActivity.EXTRA_ID, currentRecipeID);
-        Intent fillInIntent = new Intent();
-        fillInIntent.putExtras(extras);
-        views.setOnClickFillInIntent(R.id.piece_of_ingredient, fillInIntent);
-
-        return views;
-
+        pieceOfIngredient = String.valueOf(builder2);
+        return pieceOfIngredient;
     }
 
     @Override
@@ -162,7 +168,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     @Override
     public int getViewTypeCount() {
-        return 1; // Treat all items in the GridView the same
+        return 1; // Treat all items in the ListView the same
     }
 
     @Override

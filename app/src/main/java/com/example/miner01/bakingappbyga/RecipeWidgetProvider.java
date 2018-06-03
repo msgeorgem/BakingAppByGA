@@ -32,11 +32,12 @@ import static com.example.miner01.bakingappbyga.MainActivity.isSizeXLarge;
 
 public class RecipeWidgetProvider extends AppWidgetProvider {
 
+    public static final String EXTRA_NAME = "Recipe_name";
+    public static final String EXTRA_ID = "Recipe_Id";
     static Intent appIntent;
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
-    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager,
-                                int imgRes, long plantId, boolean showWater, int appWidgetId) {
+    static void updateAppWidget(Context context, AppWidgetManager appWidgetManager, int appWidgetId) {
         // Get current width to decide on single plant vs garden grid view
         Bundle options = appWidgetManager.getAppWidgetOptions(appWidgetId);
         int width = options.getInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH);
@@ -54,15 +55,11 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
      *
      * @param context          The calling context
      * @param appWidgetManager The widget manager
-     * @param imgRes           The image resource for single plant mode
-     * @param plantId          The database ID for that plant
-     * @param showWater        Boolean to show/hide water drop button
      * @param appWidgetIds     Array of widget Ids to be updated
      */
-    public static void updatePlantWidgets(Context context, AppWidgetManager appWidgetManager,
-                                          int imgRes, long plantId, boolean showWater, int[] appWidgetIds) {
+    public static void updatePlantWidgets(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         for (int appWidgetId : appWidgetIds) {
-            updateAppWidget(context, appWidgetManager, imgRes, plantId, showWater, appWidgetId);
+            updateAppWidget(context, appWidgetManager, appWidgetId);
         }
     }
 
@@ -91,7 +88,7 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.ingredient_widget);
         // Update image and text
 //        views.setImageViewResource(R.id.widget_plant_image, imgRes);
-        views.setTextViewText(R.id.piece_of_ingredient, String.valueOf(plantId));
+        views.setTextViewText(R.id.widget_ingredients, String.valueOf(plantId));
         // Show/Hide the water drop button
 //        if (showWater) views.setViewVisibility(R.id.widget_water_button, View.VISIBLE);
 //        else views.setViewVisibility(R.id.widget_water_button, View.INVISIBLE);
@@ -115,19 +112,19 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
      */
     private static RemoteViews getRecipeListRemoteView(Context context) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget_list_view);
-        // Set the GridWidgetService intent to act as the adapter for the GridView
+        // Set the ListWidgetService intent to act as the adapter for the GridView
         Intent intent = new Intent(context, ListWidgetService.class);
-        views.setRemoteAdapter(R.id.widget_list_view, intent);
-        // Set the PlantDetailActivity intent to launch when clicked
+        views.setRemoteAdapter(R.id.widget_stack_view, intent);
+        // Set the DetailActivity intent to launch when clicked
         if (isSizeXLarge) {
             appIntent = new Intent(context, DetailedStepActivity.class);
         } else {
             appIntent = new Intent(context, DetailActivity.class);
         }
         PendingIntent appPendingIntent = PendingIntent.getActivity(context, 0, appIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-        views.setPendingIntentTemplate(R.id.widget_list_view, appPendingIntent);
+        views.setPendingIntentTemplate(R.id.widget_stack_view, appPendingIntent);
         // Handle empty gardens
-        views.setEmptyView(R.id.widget_list_view, R.id.empty_view);
+        views.setEmptyView(R.id.widget_stack_view, R.id.empty_view);
         return views;
     }
 
@@ -135,6 +132,12 @@ public class RecipeWidgetProvider extends AppWidgetProvider {
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         //Start the intent service update widget action, the service takes care of updating the widgets UI
 //        PlantWateringService.startActionUpdatePlantWidgets(context);
+        for (int appWidgetId : appWidgetIds) {
+            updateAppWidget(context, appWidgetManager, appWidgetId);
+        }
+
+        super.onUpdate(context, appWidgetManager, appWidgetIds);
+
     }
 
     @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
