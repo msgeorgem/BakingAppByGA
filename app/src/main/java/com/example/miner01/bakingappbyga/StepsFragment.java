@@ -39,6 +39,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.example.miner01.bakingappbyga.DetailActivity.mDetailBinding;
+import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_DESCRIPTION;
+import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_STEP_NUMBER;
+import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_VIDEOURL;
 
 
 /**
@@ -53,9 +56,6 @@ import static com.example.miner01.bakingappbyga.DetailActivity.mDetailBinding;
 public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
 
     public static final String TAG = StepsFragment.class.getSimpleName();
-    public static final String EXTRA_DESCRIPTION = "EXTRA_DESCRIPTION";
-    public static final String EXTRA_VIDEOURL = "EXTRA_VIDEOURL";
-    public static final String EXTRA_STEP_NUMBER = "EXTRA_STEP_NUMBER";
     private SimpleExoPlayer mExoPlayer;
     private MediaSessionCompat mMediaSession;
     private SimpleExoPlayerView mPlayerView;

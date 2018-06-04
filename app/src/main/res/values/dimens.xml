@@ -12,6 +12,7 @@
     <dimen name="layout_elevation_08">8dp</dimen>
     <dimen name="layout_elevation_16">16dp</dimen>
 
+    <dimen name="font_size01">16sp</dimen>
     <dimen name="font_size0">18sp</dimen>
     <dimen name="font_size1">18sp</dimen>
     <dimen name="font_size2">25sp</dimen>

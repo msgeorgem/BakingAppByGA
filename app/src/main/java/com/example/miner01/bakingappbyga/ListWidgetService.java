@@ -18,16 +18,13 @@ package com.example.miner01.bakingappbyga;
 
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService;
-import android.widget.TextView;
 
 import com.example.miner01.bakingappbyga.Utils.JsonString;
 import com.example.miner01.bakingappbyga.Utils.JsonUtils;
-import com.example.miner01.bakingappbyga.databinding.ActivityDetailBinding;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -43,23 +40,20 @@ public class ListWidgetService extends RemoteViewsService {
 
 class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
-    public static ActivityDetailBinding mDetailBinding;
+
     public static Recipes recipes;
     public static String currentRecipeID;
+    private int stepNumber;
     Context mContext;
-    Cursor mCursor;
-    private int mAppWidgetId;
+
     private List<String[]> recipesIngredients;
-    private List<String[]> currentRecipeIngredients = new ArrayList<>();
+    private List<String[]> recipesSteps;
+
     private ArrayList<Recipes> recipesList = new ArrayList<>();
-    private ArrayList<String[]> ingredientsList = new ArrayList<>();
-    private TextView mTitle;
 
 
     public ListRemoteViewsFactory(Context applicationContext) {
         mContext = applicationContext;
-//        mAppWidgetId = intent.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
-//                AppWidgetManager.INVALID_APPWIDGET_ID);
 
     }
 
@@ -100,30 +94,26 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
         RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.ingredient_widget);
 
-        // Update the plant image
-//        int imgRes = PlantUtils.getPlantImageRes(mContext, timeNow - createdAt, timeNow - wateredAt, plantType);
-//        views.setImageViewResource(R.id.widget_plant_image, imgRes);
         views.setTextViewText(R.id.widget_recipe_title, recipes.getName());
         views.setTextViewText(R.id.widget_ingredients, getRecipeIngredients(currentRecipeID, recipes));
-//        views.setTextViewText(R.id.widget_ingredients, recipes.getID());
-        // Always hide the water drop in GridView mode
-//        views.setViewVisibility(R.id.widget_water_button, View.GONE);
 
         // Fill in the onClick PendingIntent Template using the specific plant Id for each item individually
         Bundle extras = new Bundle();
         extras.putString(MainActivity.EXTRA_ID, recipes.getID());
+        extras.putString(MainActivity.EXTRA_NAME, recipes.getName());
+
+        int stepNumber = -9;
+        extras.putInt(MainActivity.EXTRA_STEP_NUMBER, stepNumber);
+        String detailedDescription = "";
+        extras.putString(MainActivity.EXTRA_DESCRIPTION, detailedDescription);
+        String videoUrl = "";
+        extras.putString(MainActivity.EXTRA_VIDEOURL, videoUrl);
+
         Intent fillInIntent = new Intent();
         fillInIntent.putExtras(extras);
-        views.setOnClickFillInIntent(R.id.widget_recipe_title, fillInIntent);
-
-//        Bundle extras = new Bundle();
-//        extras.putLong(MainActivity.EXTRA_ID, currentRecipeID);
-//        Intent fillInIntent = new Intent();
-//        fillInIntent.putExtras(extras);
-//        views.setOnClickFillInIntent(R.id.piece_of_ingredient, fillInIntent);
+        views.setOnClickFillInIntent(R.id.widget, fillInIntent);
 
         return views;
-
     }
 
     private String getPositionedID(int position) {
@@ -139,6 +129,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     private String getRecipeIngredients(String currentRecipeID, Recipes recipes) {
         String pieceOfIngredient = "";
         String currentRecipeIDString = currentRecipeID;
+        List<String[]> currentRecipeIngredients = new ArrayList<>();
 
         recipesIngredients = recipes.getIngredients();
 
@@ -171,6 +162,28 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         pieceOfIngredient = String.valueOf(builder2);
         return pieceOfIngredient;
     }
+
+//    private ArrayList<String[]> getRecipeDetails(String currentRecipeID, Recipes recipes) {
+//        ArrayList<String[]> currentRecipeDetails = new ArrayList<>();
+//
+//        recipesSteps = recipes.getSteps();
+//        for (int i = 0; i < recipesSteps.size(); i++) {
+//            String[] elements = recipesSteps.get(i);
+//            String firstStepElement = elements[0];
+//
+//            if (firstStepElement.equals(currentRecipeID)) {
+//                String[] elements4 = new String[4];
+//
+//                elements4[0] = elements[0];
+//                elements4[1] = elements[1];
+//                elements4[2] = elements[2];
+//                elements4[3] = elements[3];
+//
+//                currentRecipeDetails.add(elements4);
+//                }
+//        }
+//        return currentRecipeDetails;
+//    }
 
     @Override
     public RemoteViews getLoadingView() {

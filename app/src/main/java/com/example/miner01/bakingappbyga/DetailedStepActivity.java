@@ -38,9 +38,10 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
 
-import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_DESCRIPTION;
-import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_STEP_NUMBER;
-import static com.example.miner01.bakingappbyga.StepsFragment.EXTRA_VIDEOURL;
+import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_DESCRIPTION;
+import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_STEP_NUMBER;
+import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_VIDEOURL;
+
 
 public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer.EventListener {
 
@@ -235,10 +236,10 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
      * Initializes the Media Session to be enabled with media buttons, transport controls, callbacks
      * and media controller.
      */
-    public static void initializeMediaSession() {
+    public void initializeMediaSession() {
 
         // Create a MediaSessionCompat.
-        mMediaSession = new MediaSessionCompat(DetailActivity.context, TAG);
+        mMediaSession = new MediaSessionCompat(this, TAG);
 
         // Enable callbacks from MediaButtons and TransportControls.
         mMediaSession.setFlags(

@@ -21,6 +21,9 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String EXTRA_ID = "EXTRA_ID";
     public static final String EXTRA_NAME = "EXTRA_NAME";
+    public static final String EXTRA_DESCRIPTION = "EXTRA_DESCRIPTION";
+    public static final String EXTRA_VIDEOURL = "EXTRA_VIDEOURL";
+    public static final String EXTRA_STEP_NUMBER = "EXTRA_STEP_NUMBER";
 
 
     public static final String LOG_TAG = MainActivity.class.getName();

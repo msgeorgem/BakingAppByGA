@@ -43,7 +43,7 @@
 
             <TextView
                 android:id="@+id/ingredients"
-                style="@style/Ingredients" />
+                style="@style/Ingredients0" />
         </ScrollView>
 
     </android.support.constraint.ConstraintLayout>
