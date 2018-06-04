@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
         isSizeXLarge = context.getResources().getConfiguration()
                 .isLayoutSizeAtLeast(sizeXLarge);
 
-
         if (isSizeXLarge) {
 
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);

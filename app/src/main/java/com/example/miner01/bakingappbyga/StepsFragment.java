@@ -79,7 +79,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
     private Uri uriCurrentVideoStep;
     private int stepNumber;
 
-
     public StepsFragment() {
         // Required empty public constructor
     }
@@ -88,7 +87,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-
         mFragmentStepsBinding = DataBindingUtil.inflate(inflater, R.layout.fragment_steps, container, false);
         view = mFragmentStepsBinding.getRoot();
 
@@ -274,7 +272,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
 
         mMediaSession.setPlaybackState(mStateBuilder.build());
 
-
         // MySessionCallback has methods that handle callbacks from a media controller.
         mMediaSession.setCallback(new MySessionCallback());
 
@@ -282,7 +279,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
         mMediaSession.setActive(true);
 
     }
-
     /**
      * Release the player when the activity is destroyed.
      */

@@ -43,14 +43,11 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     public static Recipes recipes;
     public static String currentRecipeID;
-    private int stepNumber;
     Context mContext;
 
     private List<String[]> recipesIngredients;
-    private List<String[]> recipesSteps;
 
     private ArrayList<Recipes> recipesList = new ArrayList<>();
-
 
     public ListRemoteViewsFactory(Context applicationContext) {
         mContext = applicationContext;
@@ -162,28 +159,6 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
         pieceOfIngredient = String.valueOf(builder2);
         return pieceOfIngredient;
     }
-
-//    private ArrayList<String[]> getRecipeDetails(String currentRecipeID, Recipes recipes) {
-//        ArrayList<String[]> currentRecipeDetails = new ArrayList<>();
-//
-//        recipesSteps = recipes.getSteps();
-//        for (int i = 0; i < recipesSteps.size(); i++) {
-//            String[] elements = recipesSteps.get(i);
-//            String firstStepElement = elements[0];
-//
-//            if (firstStepElement.equals(currentRecipeID)) {
-//                String[] elements4 = new String[4];
-//
-//                elements4[0] = elements[0];
-//                elements4[1] = elements[1];
-//                elements4[2] = elements[2];
-//                elements4[3] = elements[3];
-//
-//                currentRecipeDetails.add(elements4);
-//                }
-//        }
-//        return currentRecipeDetails;
-//    }
 
     @Override
     public RemoteViews getLoadingView() {
