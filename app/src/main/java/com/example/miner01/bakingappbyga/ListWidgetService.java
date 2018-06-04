@@ -95,8 +95,8 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
     @Override
     public RemoteViews getViewAt(int position) {
         recipes = recipesList.get(position);
-        currentRecipeID = recipes.getID();
-        Log.i("widget", currentRecipeID);
+        currentRecipeID = getPositionedID(position);
+        Log.i("widget", String.valueOf(currentRecipeID));
 
         RemoteViews views = new RemoteViews(mContext.getPackageName(), R.layout.ingredient_widget);
 
@@ -126,16 +126,27 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
 
     }
 
+    private String getPositionedID(int position) {
+        String currentid = "";
+        String positionStr = "";
+        currentid = recipes.getID();
+        if (String.valueOf(position + 1).equals(currentid)) {
+            positionStr = String.valueOf(position + 1);
+        }
+        return positionStr;
+    }
+
     private String getRecipeIngredients(String currentRecipeID, Recipes recipes) {
         String pieceOfIngredient = "";
+        String currentRecipeIDString = currentRecipeID;
 
         recipesIngredients = recipes.getIngredients();
 
         for (int i = 0; i < recipesIngredients.size(); i++) {
             String[] elements = recipesIngredients.get(i);
             String firstElementRecipe = elements[0];
-            Log.i("widget get", currentRecipeID);
-            if (firstElementRecipe.equals(currentRecipeID)) {
+            Log.i("widget get", currentRecipeIDString);
+            if (firstElementRecipe.equals(currentRecipeIDString)) {
                 String[] ingredientArr = new String[3];
                 ingredientArr[0] = elements[1];
                 ingredientArr[1] = elements[2];
@@ -143,7 +154,7 @@ class ListRemoteViewsFactory implements RemoteViewsService.RemoteViewsFactory {
                 currentRecipeIngredients.add(ingredientArr);
             }
         }
-
+        Log.i("widget ingedients size", String.valueOf(currentRecipeIngredients.size()));
         StringBuilder builder2 = new StringBuilder();
         for (String[] details : currentRecipeIngredients) {
 
