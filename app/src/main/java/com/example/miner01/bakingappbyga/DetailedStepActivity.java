@@ -14,6 +14,7 @@ import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.TextView;
 
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -65,6 +66,8 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     private TextView mNoVideoAvailabe;
     private Uri uriCurrentVideoStep;
     private Context context;
+    private long playerPosition;
+    private boolean isPlayWhenReady;
 
 
 
@@ -94,9 +97,11 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         mStepBack = findViewById(R.id.step_back);
         mStepBackFrame = findViewById(R.id.step_back_frame);
         mStepForthFrame = findViewById(R.id.step_forth_frame);
+        playerPosition = C.TIME_UNSET;
 
         currentDetailedDescription = "";
         String currentVideoStep = "";
+
         releasePlayer();
         initializeMediaSession();
 
@@ -113,6 +118,8 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             uriCurrentVideoStep = checkUrl(savedInstanceState.getString("video"));
             currentStepNumberInt = savedInstanceState.getInt("number");
             currentDetailedDescription = savedInstanceState.getString("description");
+            playerPosition = savedInstanceState.getLong("player_position", C.TIME_UNSET);
+            isPlayWhenReady = savedInstanceState.getBoolean("playstate");
         }
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
@@ -164,6 +171,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                 public void onClick(View view) {
 
                     int nextStepNo = getNextStepNo(currentStepNumberInt);
+                    playerPosition = C.TIME_UNSET;
 
                     String[] nextStep = getNextPrevStep(nextStepNo);
                     int tempInt = Integer.parseInt(nextStep[1]);
@@ -193,6 +201,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                 @Override
                 public void onClick(View view) {
                     int backStepNo = getPrevStepNo(currentStepNumberInt);
+                    playerPosition = C.TIME_UNSET;
 
                     String[] backStep = getNextPrevStep(backStepNo);
                     int tempInt = Integer.parseInt(backStep[1]);
@@ -350,8 +359,9 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
             String userAgent = Util.getUserAgent(context, "ClassicalMusicQuiz");
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     context, userAgent), new DefaultExtractorsFactory(), null, null);
+            if (playerPosition != C.TIME_UNSET) mExoPlayer.seekTo(playerPosition);
             mExoPlayer.prepare(mediaSource);
-            mExoPlayer.setPlayWhenReady(true);
+            mExoPlayer.setPlayWhenReady(isPlayWhenReady);
         }
     }
 
@@ -379,6 +389,34 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         super.onDestroy();
         releasePlayer();
         mMediaSession.setActive(false);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mExoPlayer != null) {
+            playerPosition = mExoPlayer.getCurrentPosition();
+            isPlayWhenReady = mExoPlayer.getPlayWhenReady();
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (uriCurrentVideoStep != null)
+            initializePlayer(uriCurrentVideoStep);
     }
 
     @Override
@@ -424,10 +462,20 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         void onFragmentInteraction(Uri uri);
     }
 
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putString("video", String.valueOf(uriCurrentVideoStep));
+        outState.putInt("number", currentStepNumberInt);
+        outState.putString("description", String.valueOf(currentDetailedDescription));
+        outState.putLong("player_position", playerPosition);
+        outState.putBoolean("playstate", isPlayWhenReady);
+    }
+
     /**
      * Media Session Callbacks, where all external clients control the player.
      */
-    private static class MySessionCallback extends MediaSessionCompat.Callback {
+    private class MySessionCallback extends MediaSessionCompat.Callback {
         @Override
         public void onPlay() {
             mExoPlayer.setPlayWhenReady(true);
@@ -442,14 +490,5 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         public void onSkipToPrevious() {
             mExoPlayer.seekTo(0);
         }
-    }
-
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-        outState.putString("video", String.valueOf(uriCurrentVideoStep));
-        outState.putInt("number", currentStepNumberInt);
-        outState.putString("description", String.valueOf(currentDetailedDescription));
     }
 }

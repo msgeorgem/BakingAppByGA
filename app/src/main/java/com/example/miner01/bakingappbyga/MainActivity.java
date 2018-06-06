@@ -2,7 +2,6 @@ package com.example.miner01.bakingappbyga;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,7 @@ import com.example.miner01.bakingappbyga.Utils.JsonUtils;
 
 import java.util.ArrayList;
 
-import static android.content.res.Configuration.SCREENLAYOUT_SIZE_XLARGE;
+import static android.content.res.Configuration.SCREENLAYOUT_SIZE_LARGE;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -31,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Recipes> recipesList = new ArrayList<>();
     private RecyclerView recipesRecyclerView;
     public static int sizeXLarge;
-    public static boolean isSizeXLarge;
+    public static boolean isSizeLarge;
 
     /**
      * Adapter for the list of recipes
@@ -50,13 +49,12 @@ public class MainActivity extends AppCompatActivity {
         recipesRecyclerView = findViewById(R.id.list_item);
         recipesList = JsonUtils.parseRecipesJson(JsonString.strJson);
 
-        sizeXLarge = SCREENLAYOUT_SIZE_XLARGE; // For sizeXLarge Tablets
-        isSizeXLarge = context.getResources().getConfiguration()
+        sizeXLarge = SCREENLAYOUT_SIZE_LARGE; // For sizeXLarge Tablets
+        isSizeLarge = context.getResources().getConfiguration()
                 .isLayoutSizeAtLeast(sizeXLarge);
 
-        if (isSizeXLarge) {
+        if (isSizeLarge) {
 
-            this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
             if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
                 recipesRecyclerView.setLayoutManager(new GridLayoutManager(context, 2));
             } else {

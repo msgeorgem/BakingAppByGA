@@ -17,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.miner01.bakingappbyga.databinding.FragmentStepsBinding;
+import com.google.android.exoplayer2.C;
 import com.google.android.exoplayer2.DefaultLoadControl;
 import com.google.android.exoplayer2.ExoPlaybackException;
 import com.google.android.exoplayer2.ExoPlayer;
@@ -78,6 +79,8 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
     private FragmentStepsBinding mFragmentStepsBinding;
     private Uri uriCurrentVideoStep;
     private int stepNumber;
+    private long playerPosition;
+    private boolean isPlayWhenReady;
 
     public StepsFragment() {
         // Required empty public constructor
@@ -95,9 +98,15 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
         stepsRecyclerView = mFragmentStepsBinding.listSteps;
         currentRecipeDetailsWithStepNo = getCurrentRecipeDetailsWithStepNo();
         stepsRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        playerPosition = C.TIME_UNSET;
+
+        if (savedInstanceState != null) {
+            isPlayWhenReady = savedInstanceState.getBoolean("playstate");
+            playerPosition = savedInstanceState.getLong("player_position", C.TIME_UNSET);
+        }
 
         // Tablet code
-        if (MainActivity.isSizeXLarge) {
+        if (MainActivity.isSizeLarge) {
             mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.just_click_step));
             mListener = new RecipeDetailAdapter.OnItemClickListener() {
 
@@ -119,7 +128,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
                         mDetailBinding.part3.playerViewFrame.setVisibility(View.GONE);
                         mDetailBinding.part3.noVideoAvailable.setVisibility(View.VISIBLE);
                         mDetailBinding.part3.noVideoAvailable.setText(getResources().getString(R.string.no_video_available));
-                        releasePlayer();
+
 
                     } else {
                         mDetailBinding.part3.noVideoAvailable.setVisibility(View.GONE);
@@ -227,6 +236,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
             String userAgent = Util.getUserAgent(getActivity(), "ClassicalMusicQuiz");
             MediaSource mediaSource = new ExtractorMediaSource(mediaUri, new DefaultDataSourceFactory(
                     getActivity(), userAgent), new DefaultExtractorsFactory(), null, null);
+            if (playerPosition != C.TIME_UNSET) mExoPlayer.seekTo(playerPosition);
             mExoPlayer.prepare(mediaSource);
             mExoPlayer.setPlayWhenReady(true);
         }
@@ -286,7 +296,6 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
     public void onDestroy() {
         super.onDestroy();
         releasePlayer();
-//        mMediaSession.setActive(false);
     }
 
     @Override
@@ -326,6 +335,35 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
 
     }
 
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (mExoPlayer != null) {
+            mExoPlayer.stop();
+            mExoPlayer.release();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        if (mExoPlayer != null) {
+            playerPosition = mExoPlayer.getCurrentPosition();
+            isPlayWhenReady = mExoPlayer.getPlayWhenReady();
+            mExoPlayer.stop();
+            mExoPlayer.release();
+            mExoPlayer = null;
+        }
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        if (uriCurrentVideoStep != null)
+            initializePlayer(uriCurrentVideoStep);
+    }
+
     /**
      * Media Session Callbacks, where all external clients control the player.
      */
@@ -349,5 +387,12 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putLong("player_position", playerPosition);
+        outState.putBoolean("playstate", isPlayWhenReady);
     }
 }

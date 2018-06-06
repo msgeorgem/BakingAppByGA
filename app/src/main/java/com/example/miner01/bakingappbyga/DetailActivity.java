@@ -8,6 +8,7 @@ import android.content.pm.ActivityInfo;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
@@ -22,7 +23,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.example.miner01.bakingappbyga.MainActivity.isSizeXLarge;
+import static com.example.miner01.bakingappbyga.MainActivity.isSizeLarge;
 
 
 public class DetailActivity extends AppCompatActivity implements StepsFragment.OnFragmentInteractionListener {
@@ -47,17 +48,13 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         context = getApplicationContext();
         mDetailBinding = DataBindingUtil.setContentView(this, R.layout.activity_detail);
 
-
-        if (isSizeXLarge) {
+        if (isSizeLarge) {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         } else {
             this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         }
 
-
         mStep = getResources().getString(R.string.step);
-
-        getSupportActionBar().hide();
 
         Intent intent = getIntent();
         if (intent == null) {
@@ -70,6 +67,12 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
         currentRecipeID = intent.getStringExtra(MainActivity.EXTRA_ID);
         mTitle = findViewById(R.id.recipe_title);
         mTitle.setText(intent.getStringExtra(MainActivity.EXTRA_NAME));
+        mTitle.setVisibility(View.GONE);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(intent.getStringExtra(MainActivity.EXTRA_NAME));
+        }
 
         Log.i("detail activity", currentRecipeID);
 
@@ -120,7 +123,7 @@ public class DetailActivity extends AppCompatActivity implements StepsFragment.O
     @Override
     public void onBackPressed() {
         super.onBackPressed();
-        if (isSizeXLarge) {
+        if (isSizeLarge) {
 
             int slectedIndex = -9;
             RecipeDetailAdapter.setSelectedIndex(-9);
