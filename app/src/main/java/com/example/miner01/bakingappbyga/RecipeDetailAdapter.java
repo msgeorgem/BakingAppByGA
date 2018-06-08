@@ -11,7 +11,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.miner01.bakingappbyga.Utils.VideoRequestHandler;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -24,7 +23,7 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
     private final OnItemClickListener listener;
     private ArrayList<String[]> mListStepsAdapter;
     public static int selectedIndex = -9;
-    VideoRequestHandler videoRequestHandler;
+
     Picasso picassoInstance;
 
 
@@ -62,15 +61,16 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
 
 
         viewHolder.thumbnailURL = currentStep[4];
-        Context context = viewHolder.itemView.getContext()
+        viewHolder.thumbnail.setTag(currentStep[4]);
+        Context context = viewHolder.itemView.getContext();
 
         Uri path = Uri.parse(viewHolder.thumbnailURL);
         if (currentStep[4].equals("")) {
             viewHolder.thumbnail.setImageResource(R.drawable.default_thumb);
         } else {
             try {
-                task = new ThumbNailLoader(context, currentStep[4], viewHolder.thumbnail);
-                task.execute();
+                ThumbNailLoader task = new ThumbNailLoader();
+                task.execute(viewHolder.thumbnail);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }

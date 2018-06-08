@@ -98,6 +98,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         mPlayerViewFrame = findViewById(R.id.playerViewFrame);
         mNoVideoAvailabe = findViewById(R.id.noVideoAvailable);
         mNoVideoAvailabeImage = findViewById(R.id.noVideoAvailableImage);
+        mNoVideoAvailabeImage.setVisibility(View.GONE);
 
         mDetailedDescription = findViewById(R.id.detailed_description);
         mCurrentRecipeNoLabel = getResources().getString(R.string.current_step);
@@ -148,10 +149,10 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                 mNoVideoAvailabe.setText(getResources().getString(R.string.no_video_available));
 
             } else {
-                mNoVideoAvailabeImage.setVisibility(View.VISIBLE);
+                mNoVideoAvailabeImage.setVisibility(View.GONE);
                 mNoVideoAvailabe.setVisibility(View.GONE);
-//                mPlayerView.setVisibility(View.VISIBLE);
-//                mPlayerViewFrame.setVisibility(View.VISIBLE);
+                mPlayerView.setVisibility(View.VISIBLE);
+                mPlayerViewFrame.setVisibility(View.VISIBLE);
             }
         }
 
@@ -172,35 +173,35 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                         currentStepNumberInt));
             }
         }
-//        loadVideo(uriCurrentVideoStep);
+        loadVideo(uriCurrentVideoStep);
 
 
-        if (uriCurrentVideoStep == null) {
-            mNoVideoAvailabeImage.setImageResource(R.drawable.default_thumb);
-        } else {
-            Context context = mNoVideoAvailabeImage.getContext();
-//            Picasso.with(context)
-//                    .load(thumb)
-//                    .fit()
-//                    .error(R.drawable.default_thumb)
-//                    .into(viewHolder.thumbnail);
-
-            SuziLoader loader = new SuziLoader(); //Create it for once
-            loader.with(context) //Context
-                    .load(String.valueOf(uriCurrentVideoStep)) //Video path
-                    .into(mNoVideoAvailabeImage) // imageview to load the thumbnail
-                    .type("mini") // mini or micro
-                    .show(); // to show the thumbnail
-
-
-            Bitmap bmThumbnail;
-            Bitmap myPictureBitmap = BitmapFactory.decodeFile(String.valueOf(uriCurrentVideoStep));
-            myPictureBitmap = Bitmap.createScaledBitmap(myPictureBitmap, myPictureBitmap.getWidth(), myPictureBitmap.getHeight(), true);
-            // MICRO_KIND: 96 x 96 thumbnail
-            bmThumbnail = ThumbnailUtils.createVideoThumbnail(String.valueOf(uriCurrentVideoStep),
-                    MediaStore.Images.Thumbnails.MICRO_KIND);
-            mNoVideoAvailabeImage.setImageBitmap(myPictureBitmap);
-        }
+//        if (uriCurrentVideoStep == null) {
+//            mNoVideoAvailabeImage.setImageResource(R.drawable.default_thumb);
+//        } else {
+//            Context context = mNoVideoAvailabeImage.getContext();
+////            Picasso.with(context)
+////                    .load(thumb)
+////                    .fit()
+////                    .error(R.drawable.default_thumb)
+////                    .into(viewHolder.thumbnail);
+//
+//            SuziLoader loader = new SuziLoader(); //Create it for once
+//            loader.with(context) //Context
+//                    .load(String.valueOf(uriCurrentVideoStep)) //Video path
+//                    .into(mNoVideoAvailabeImage) // imageview to load the thumbnail
+//                    .type("mini") // mini or micro
+//                    .show(); // to show the thumbnail
+//
+//
+//            Bitmap bmThumbnail;
+//            Bitmap myPictureBitmap = BitmapFactory.decodeFile(String.valueOf(uriCurrentVideoStep));
+//            myPictureBitmap = Bitmap.createScaledBitmap(myPictureBitmap, myPictureBitmap.getWidth(), myPictureBitmap.getHeight(), true);
+//            // MICRO_KIND: 96 x 96 thumbnail
+//            bmThumbnail = ThumbnailUtils.createVideoThumbnail(String.valueOf(uriCurrentVideoStep),
+//                    MediaStore.Images.Thumbnails.MICRO_KIND);
+//            mNoVideoAvailabeImage.setImageBitmap(myPictureBitmap);
+//        }
 
 
 
