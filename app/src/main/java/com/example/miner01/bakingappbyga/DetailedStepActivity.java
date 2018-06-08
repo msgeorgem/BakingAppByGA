@@ -71,7 +71,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     private FrameLayout mPlayerViewFrame;
     private int maxNumberOfSteps;
     private TextView mNoVideoAvailabe;
-    private ImageView mNoVideoAvailabeImage;
     private Uri uriCurrentVideoStep;
     private Context context;
     private long playerPosition;
@@ -97,8 +96,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         mPlayerView = findViewById(R.id.playerView);
         mPlayerViewFrame = findViewById(R.id.playerViewFrame);
         mNoVideoAvailabe = findViewById(R.id.noVideoAvailable);
-        mNoVideoAvailabeImage = findViewById(R.id.noVideoAvailableImage);
-        mNoVideoAvailabeImage.setVisibility(View.GONE);
 
         mDetailedDescription = findViewById(R.id.detailed_description);
         mCurrentRecipeNoLabel = getResources().getString(R.string.current_step);
@@ -149,7 +146,6 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                 mNoVideoAvailabe.setText(getResources().getString(R.string.no_video_available));
 
             } else {
-                mNoVideoAvailabeImage.setVisibility(View.GONE);
                 mNoVideoAvailabe.setVisibility(View.GONE);
                 mPlayerView.setVisibility(View.VISIBLE);
                 mPlayerViewFrame.setVisibility(View.VISIBLE);

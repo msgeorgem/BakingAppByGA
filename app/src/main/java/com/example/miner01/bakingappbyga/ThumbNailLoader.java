@@ -1,5 +1,6 @@
 package com.example.miner01.bakingappbyga;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
@@ -8,7 +9,9 @@ import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
 import android.os.FileObserver;
 import android.util.Log;
+import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 
 import com.example.miner01.bakingappbyga.Utils.RetrieveVideoFrame;
 import com.squareup.picasso.Picasso;
@@ -31,18 +34,30 @@ public class ThumbNailLoader extends AsyncTask<ImageView, Void, Bitmap> {
     private String mUrl;
     InputStream in;
     private int mPosition;
+    ProgressBar progressBar;
 
     /**
      * Query URL
      */
 
-//    ThumbNailLoader(Context context, String Url, int position) {
-//        this.context = context;
+    ThumbNailLoader(Context context, ProgressBar progressBar) {
+        this.context = context;
 //        mUrl = Url;
 //        mPosition = position;
+        this.progressBar = progressBar;
+    }
+//    @Override
+//    protected void onPreExecute() {
+//
+//        super.onPreExecute();
+////        ProgressDialog progDailog = new ProgressDialog(context);
+////        progDailog.setMessage("Loading...");
+////        progDailog.setIndeterminate(false);
+////        progDailog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+////        progDailog.setCancelable(true);
+////        progDailog.show();
+//
 //    }
-
-
     /**
      * This is on a background thread.
      */
@@ -74,6 +89,7 @@ public class ThumbNailLoader extends AsyncTask<ImageView, Void, Bitmap> {
         }
         if (mImageView != null) {
             if (bitmap != null) {
+                progressBar.setVisibility(View.GONE);
                 mImageView.setImageBitmap(bitmap);
             } else {
                 Drawable placeholder = mImageView.getContext().getResources().getDrawable(R.drawable.default_thumb);

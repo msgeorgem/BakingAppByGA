@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
@@ -66,10 +67,11 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
 
         Uri path = Uri.parse(viewHolder.thumbnailURL);
         if (currentStep[4].equals("")) {
+            viewHolder.pgsBar.setVisibility(View.GONE);
             viewHolder.thumbnail.setImageResource(R.drawable.default_thumb);
         } else {
             try {
-                ThumbNailLoader task = new ThumbNailLoader();
+                ThumbNailLoader task = new ThumbNailLoader(context,viewHolder.pgsBar);
                 task.execute(viewHolder.thumbnail);
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
@@ -94,6 +96,7 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
 
     public class MainViewHolder extends RecyclerView.ViewHolder {
         TextView stepNo;
+        ProgressBar pgsBar;
         TextView detailStepTextView;
         String thumbnailURL;
         ImageView thumbnail;
@@ -106,7 +109,7 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
                     .findViewById(R.id.detail_step);
             this.wholeView = view.findViewById(R.id.step_layout);
             this.thumbnail = view.findViewById(R.id.step_thumbnail);
-
+            this.pgsBar = view.findViewById(R.id.pBar);
         }
 
         public void bind(final String[] item, final OnItemClickListener listener) {
