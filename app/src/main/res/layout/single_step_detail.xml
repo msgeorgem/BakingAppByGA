@@ -22,19 +22,31 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            app:layout_constraintGuide_percent="0.25" />
+            app:layout_constraintGuide_percent="0.33" />
+
+        <ImageView
+            android:id="@+id/step_thumbnail"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:contentDescription="@string/ingredients"
+            android:gravity="start"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
         <TextView
             android:id="@+id/step_no"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_margin="@dimen/text_margin"
+            android:layout_marginLeft="8dp"
+            android:layout_marginStart="8dp"
             android:gravity="start"
             android:textAlignment="viewStart"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toLeftOf="@id/vertical_middle"
             android:textSize="@dimen/font_size1"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintRight_toLeftOf="@id/vertical_middle"
+            app:layout_constraintStart_toEndOf="@+id/step_thumbnail"
             app:layout_constraintTop_toTopOf="parent" />
 
         <TextView

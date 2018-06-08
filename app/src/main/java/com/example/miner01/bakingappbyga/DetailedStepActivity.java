@@ -3,8 +3,12 @@ package com.example.miner01.bakingappbyga;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -12,6 +16,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.C;
@@ -39,6 +44,8 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
 
+import xyz.neocrux.suziloader.SuziLoader;
+
 import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_DESCRIPTION;
 import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_STEP_NUMBER;
 import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_VIDEOURL;
@@ -64,6 +71,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
     private FrameLayout mPlayerViewFrame;
     private int maxNumberOfSteps;
     private TextView mNoVideoAvailabe;
+    private ImageView mNoVideoAvailabeImage;
     private Uri uriCurrentVideoStep;
     private Context context;
     private long playerPosition;
@@ -89,6 +97,7 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
         mPlayerView = findViewById(R.id.playerView);
         mPlayerViewFrame = findViewById(R.id.playerViewFrame);
         mNoVideoAvailabe = findViewById(R.id.noVideoAvailable);
+        mNoVideoAvailabeImage = findViewById(R.id.noVideoAvailableImage);
 
         mDetailedDescription = findViewById(R.id.detailed_description);
         mCurrentRecipeNoLabel = getResources().getString(R.string.current_step);
@@ -139,10 +148,10 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                 mNoVideoAvailabe.setText(getResources().getString(R.string.no_video_available));
 
             } else {
-
+                mNoVideoAvailabeImage.setVisibility(View.VISIBLE);
                 mNoVideoAvailabe.setVisibility(View.GONE);
-                mPlayerView.setVisibility(View.VISIBLE);
-                mPlayerViewFrame.setVisibility(View.VISIBLE);
+//                mPlayerView.setVisibility(View.VISIBLE);
+//                mPlayerViewFrame.setVisibility(View.VISIBLE);
             }
         }
 
@@ -163,7 +172,38 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
                         currentStepNumberInt));
             }
         }
-        loadVideo(uriCurrentVideoStep);
+//        loadVideo(uriCurrentVideoStep);
+
+
+        if (uriCurrentVideoStep == null) {
+            mNoVideoAvailabeImage.setImageResource(R.drawable.default_thumb);
+        } else {
+            Context context = mNoVideoAvailabeImage.getContext();
+//            Picasso.with(context)
+//                    .load(thumb)
+//                    .fit()
+//                    .error(R.drawable.default_thumb)
+//                    .into(viewHolder.thumbnail);
+
+            SuziLoader loader = new SuziLoader(); //Create it for once
+            loader.with(context) //Context
+                    .load(String.valueOf(uriCurrentVideoStep)) //Video path
+                    .into(mNoVideoAvailabeImage) // imageview to load the thumbnail
+                    .type("mini") // mini or micro
+                    .show(); // to show the thumbnail
+
+
+            Bitmap bmThumbnail;
+            Bitmap myPictureBitmap = BitmapFactory.decodeFile(String.valueOf(uriCurrentVideoStep));
+            myPictureBitmap = Bitmap.createScaledBitmap(myPictureBitmap, myPictureBitmap.getWidth(), myPictureBitmap.getHeight(), true);
+            // MICRO_KIND: 96 x 96 thumbnail
+            bmThumbnail = ThumbnailUtils.createVideoThumbnail(String.valueOf(uriCurrentVideoStep),
+                    MediaStore.Images.Thumbnails.MICRO_KIND);
+            mNoVideoAvailabeImage.setImageBitmap(myPictureBitmap);
+        }
+
+
+
 
         if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
             mStepForth.setOnClickListener(new View.OnClickListener() {

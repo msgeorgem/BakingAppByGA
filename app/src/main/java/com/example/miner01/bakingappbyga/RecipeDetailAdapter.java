@@ -1,11 +1,18 @@
 package com.example.miner01.bakingappbyga;
 
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.example.miner01.bakingappbyga.Utils.VideoRequestHandler;
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -17,6 +24,9 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
     private final OnItemClickListener listener;
     private ArrayList<String[]> mListStepsAdapter;
     public static int selectedIndex = -9;
+    VideoRequestHandler videoRequestHandler;
+    Picasso picassoInstance;
+
 
     public RecipeDetailAdapter(ArrayList<String[]> listSteps, OnItemClickListener listener) {
         mListStepsAdapter = listSteps;
@@ -49,6 +59,39 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
         viewHolder.stepNo.setText(String.format(Locale.ENGLISH, "%s: %s", DetailActivity.mStep,
                 currentStep[1]));
         viewHolder.detailStepTextView.setText(currentStep[2]);
+
+
+        viewHolder.thumbnailURL = currentStep[4];
+        Context context = viewHolder.itemView.getContext();
+        videoRequestHandler = new VideoRequestHandler();
+        picassoInstance = new Picasso.Builder(context.getApplicationContext())
+                .addRequestHandler(videoRequestHandler)
+                .build();
+        Bitmap bm = null;
+        Bitmap ThumbImage = null;
+
+
+        Uri path = Uri.parse(viewHolder.thumbnailURL);
+        if (currentStep[4].equals("")) {
+            viewHolder.thumbnail.setImageResource(R.drawable.default_thumb);
+        } else {
+//            picassoInstance.load(VideoRequestHandler.SCHEME_VIDEO+":"+path).fit().into(viewHolder.thumbnail);
+//            Bitmap bm = ThumbnailUtils.createVideoThumbnail(viewHolder.thumbnailURL, MediaStore.Images.Thumbnails.MICRO_KIND);
+            try {
+                new ThumbNailLoader().execute(String.valueOf(path));
+
+//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+//                imageData = baos.toByteArray();
+            } catch (Throwable throwable) {
+                throwable.printStackTrace();
+            }
+            viewHolder.thumbnail.setImageBitmap(ThumbImage);
+
+        }
+
+
+
         Log.i("selectedIndex", String.valueOf(selectedIndex));
         if (position == selectedIndex) {
             viewHolder.wholeView.setBackgroundColor(rgb(63, 81, 181));
@@ -68,6 +111,8 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
     public class MainViewHolder extends RecyclerView.ViewHolder {
         TextView stepNo;
         TextView detailStepTextView;
+        String thumbnailURL;
+        ImageView thumbnail;
         View wholeView;
 
         private MainViewHolder(View view) {
@@ -76,6 +121,7 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
             this.detailStepTextView = view
                     .findViewById(R.id.detail_step);
             this.wholeView = view.findViewById(R.id.step_layout);
+            this.thumbnail = view.findViewById(R.id.step_thumbnail);
 
         }
 

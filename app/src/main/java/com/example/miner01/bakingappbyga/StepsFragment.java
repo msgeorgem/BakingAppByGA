@@ -2,6 +2,7 @@ package com.example.miner01.bakingappbyga;
 
 
 import android.app.Fragment;
+import android.content.Context;
 import android.content.Intent;
 import android.databinding.DataBindingUtil;
 import android.net.Uri;
@@ -81,6 +82,7 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
     private int stepNumber;
     private long playerPosition;
     private boolean isPlayWhenReady;
+    private Context context = getActivity();
 
     public StepsFragment() {
         // Required empty public constructor
@@ -185,15 +187,16 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
             int firstStepElement = Integer.parseInt(elements[0]);
 
             if (firstStepElement == currentRecipeIDInt) {
-                String[] elements4 = new String[4];
+                String[] elements5 = new String[5];
 
-                elements4[0] = elements[0];
-                elements4[1] = elements[1];
-                elements4[2] = elements[2];
-                elements4[3] = elements[3];
+                elements5[0] = elements[0];
+                elements5[1] = elements[1];
+                elements5[2] = elements[2];
+                elements5[3] = elements[3];
+                elements5[4] = elements[4];
 
-                currentRecipeDetails.add(elements4);
-                Log.i("current_steps99", elements4[0] + " " + elements4[1] + " " + elements4[2] + " " + elements4[3]);
+                currentRecipeDetails.add(elements5);
+                Log.i("current_steps99", elements5[0] + " " + elements5[1] + " " + elements5[2] + " " + elements5[3]);
             }
         }
         return currentRecipeDetails;
@@ -205,13 +208,14 @@ public class StepsFragment extends Fragment implements ExoPlayer.EventListener {
         ArrayList<String[]> tempCurrentRecipeDetails = getCurrentRecipeDetails(currentRecipeIDInt);
         for (int i = 0; i < tempCurrentRecipeDetails.size(); i++) {
             String[] elements = tempCurrentRecipeDetails.get(i);
-            String[] elements5 = new String[5];
-            elements5[0] = elements[0];
-            elements5[1] = String.valueOf(i);
-            elements5[2] = elements[1];
-            elements5[3] = elements[2];
-            elements5[4] = elements[3];
-            currentRecipeDetails.add(elements5);
+            String[] elements6 = new String[6];
+            elements6[0] = elements[0];
+            elements6[1] = String.valueOf(i);
+            elements6[2] = elements[1];
+            elements6[3] = elements[2];
+            elements6[4] = elements[3];
+            elements6[5] = elements[4];
+            currentRecipeDetails.add(elements6);
         }
         return currentRecipeDetails;
     }

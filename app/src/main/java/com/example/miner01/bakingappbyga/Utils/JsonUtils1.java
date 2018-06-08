@@ -52,11 +52,12 @@ public class JsonUtils1 {
 
                 for (int m = 0; m < stepsArray.length(); m++) {
                     JSONObject step = stepsArray.getJSONObject(m);
-                    String[] stepArr  = new String[4];
+                    String[] stepArr = new String[5];
                     stepArr[0] = mId;
                     stepArr[1] = step.getString("shortDescription");
                     stepArr[2] = step.getString("description");
                     stepArr[3] = step.getString("videoURL");
+                    stepArr[4] = step.getString("thumbnailURL");
                     mSteps.add(stepArr);
 
 //                    Log.i("steps" + " " + m, mId +" " + mShortDescription + " " + mDescription + " " + mVideoURL);
