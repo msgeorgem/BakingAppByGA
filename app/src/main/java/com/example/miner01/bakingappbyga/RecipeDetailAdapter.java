@@ -62,35 +62,19 @@ public class RecipeDetailAdapter extends RecyclerView.Adapter<RecipeDetailAdapte
 
 
         viewHolder.thumbnailURL = currentStep[4];
-        Context context = viewHolder.itemView.getContext();
-        videoRequestHandler = new VideoRequestHandler();
-        picassoInstance = new Picasso.Builder(context.getApplicationContext())
-                .addRequestHandler(videoRequestHandler)
-                .build();
-        Bitmap bm = null;
-        Bitmap ThumbImage = null;
-
+        Context context = viewHolder.itemView.getContext()
 
         Uri path = Uri.parse(viewHolder.thumbnailURL);
         if (currentStep[4].equals("")) {
             viewHolder.thumbnail.setImageResource(R.drawable.default_thumb);
         } else {
-//            picassoInstance.load(VideoRequestHandler.SCHEME_VIDEO+":"+path).fit().into(viewHolder.thumbnail);
-//            Bitmap bm = ThumbnailUtils.createVideoThumbnail(viewHolder.thumbnailURL, MediaStore.Images.Thumbnails.MICRO_KIND);
             try {
-                new ThumbNailLoader().execute(String.valueOf(path));
-
-//                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-//                bm.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-//                imageData = baos.toByteArray();
+                task = new ThumbNailLoader(context, currentStep[4], viewHolder.thumbnail);
+                task.execute();
             } catch (Throwable throwable) {
                 throwable.printStackTrace();
             }
-            viewHolder.thumbnail.setImageBitmap(ThumbImage);
-
         }
-
-
 
         Log.i("selectedIndex", String.valueOf(selectedIndex));
         if (position == selectedIndex) {
