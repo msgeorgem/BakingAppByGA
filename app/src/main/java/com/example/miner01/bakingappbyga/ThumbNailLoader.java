@@ -12,40 +12,57 @@ import com.example.miner01.bakingappbyga.Utils.RetrieveVideoFrame;
  * Created by Marcin on 2017-09-12.
  */
 
-public class ThumbNailLoader extends AsyncTask<String, Void, Bitmap> {
+public class ThumbNailLoader extends AsyncTask<Void, Void, Bitmap> {
 
-    /**
-     * Tag for log messages
-     */
-    private static final String LOG_TAG = ThumbNailLoader.class.getName();
-    private Bitmap mData;
-    private FileObserver mFileObserver;
+
+    private ImageView mImageView = null;
+    private String mUrl;
+    
     /**
      * Query URL
      */
-    private String mUrl;
+    
+    ThumbNailLoader(Context context, String Url, ImageView imageview)
+    {
+        ThumbNailLoader.this.context = context;
+        mUrl = Url;
+        mImageView = imageview;
+    }
+    @Override
+    protected void onPreExecute()
+    {
+        AssetManager assetMgr = context.getAssets();
 
+        try {
+            in = assetMgr.open(mUrl);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
+    }
     /**
      * This is on a background thread.
      */
 
     @Override
-    protected Bitmap doInBackground(String... string) {
-        if (mUrl == null) {
-            return null;
-        }
+    protected Bitmap doInBackground(Void... arg0) {
+        
         Log.i(LOG_TAG, "loadInBackground");
         // Perform the network request, parse the response, and extract a list of news.
         Bitmap singleBitmap = null;
         Bitmap thumbImage = null;
         try {
-            singleBitmap = RetrieveVideoFrame.retrieveVideoFrameFromVideo(mUrl);
+            singleBitmap = RetrieveVideoFrame.retrieveVideoFrameFromVideo(in);
+            in.close();
             thumbImage = ThumbnailUtils.extractThumbnail(singleBitmap, 90, 90);
         } catch (Throwable throwable) {
             throwable.printStackTrace();
         }
 
         return thumbImage;
+    }
+    @Override
+    protected void onPostExecute(Bitmap bitmap) {
+        mImageView.setImageBitmap(bitmap);
     }
 }
