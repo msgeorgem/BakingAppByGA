@@ -3,12 +3,8 @@ package com.example.miner01.bakingappbyga;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
-import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +12,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.google.android.exoplayer2.C;
@@ -43,8 +38,6 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Locale;
-
-import xyz.neocrux.suziloader.SuziLoader;
 
 import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_DESCRIPTION;
 import static com.example.miner01.bakingappbyga.MainActivity.EXTRA_STEP_NUMBER;
@@ -116,10 +109,10 @@ public class DetailedStepActivity extends AppCompatActivity implements ExoPlayer
 
         if (savedInstanceState == null) {
             currentVideoStep = intent.getStringExtra(EXTRA_VIDEOURL);
-            Log.i("detailed_step_link", currentVideoStep);
+//            Log.i("detailed_step_link", currentVideoStep);
             uriCurrentVideoStep = checkUrl(currentVideoStep);
             currentDetailedDescription = intent.getStringExtra(EXTRA_DESCRIPTION);
-            Log.i("detailed_step_descr", currentDetailedDescription);
+//            Log.i("detailed_step_descr", currentDetailedDescription);
             currentStepNumberInt = intent.getIntExtra(EXTRA_STEP_NUMBER, 0);
         } else {
             uriCurrentVideoStep = checkUrl(savedInstanceState.getString("video"));
