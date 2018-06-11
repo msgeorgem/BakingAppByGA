@@ -1,22 +1,17 @@
 package com.example.miner01.bakingappbyga;
 
-import android.app.ProgressDialog;
 import android.content.Context;
-import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.media.ThumbnailUtils;
 import android.os.AsyncTask;
-import android.os.FileObserver;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 
 import com.example.miner01.bakingappbyga.Utils.RetrieveVideoFrame;
-import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 import static com.example.miner01.bakingappbyga.StepsFragment.LOG_TAG;
@@ -33,7 +28,6 @@ public class ThumbNailLoader extends AsyncTask<ImageView, Void, Bitmap> {
     private ImageView mImageView = null;
     private String mUrl;
     InputStream in;
-    private int mPosition;
     ProgressBar progressBar;
 
     /**
@@ -46,18 +40,7 @@ public class ThumbNailLoader extends AsyncTask<ImageView, Void, Bitmap> {
 //        mPosition = position;
         this.progressBar = progressBar;
     }
-//    @Override
-//    protected void onPreExecute() {
-//
-//        super.onPreExecute();
-////        ProgressDialog progDailog = new ProgressDialog(context);
-////        progDailog.setMessage("Loading...");
-////        progDailog.setIndeterminate(false);
-////        progDailog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-////        progDailog.setCancelable(true);
-////        progDailog.show();
-//
-//    }
+
     /**
      * This is on a background thread.
      */

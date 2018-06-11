@@ -14,7 +14,6 @@ public class RetrieveVideoFrame {
         try {
             mediaMetadataRetriever = new MediaMetadataRetriever();
             mediaMetadataRetriever.setDataSource(videoPath, new HashMap<String, String>());
-            //   mediaMetadataRetriever.setDataSource(videoPath);
             bitmap = mediaMetadataRetriever.getFrameAtTime();
         } catch (Exception e) {
             e.printStackTrace();
